@@ -1,0 +1,5 @@
+nagfor -O4 -c mpfuna.f90 mpfunb.f90 mpfunc.f90 mpfund.f90 mpfune.f90 \
+  mpfunf.f90 mpfung1.f90 mpfunh1.f90 mpmodule.f90
+nagfor -O4 -c mpfuna.f90 mpfunb.f90 mpfunc.f90 mpfund.f90 mpfune.f90 \
+  mpfunf.f90 mpfung1.f90 mpfunh1.f90 mpmodule.f90
+nagfor -O2 -c mpmask13.f90 second.f90

@@ -1,0 +1,341 @@
+PSLQM2 Test Program
+n =  57   kq = 0   kr = 7   ks = 8   ndr =   20   nrb =  200
+Full precision level ndp =   700 digits
+Full precision epsilon level nep =   -680
+PSLQM2 integer relation detection: n =   57
+Iteration       0  MP initialization
+Iteration       0  Min/max ratio in y =   2.494690e   -62
+Iteration       0  Start MP iterations
+Iteration       1
+Iteration       2
+Iteration       3
+Iteration       4
+Iteration       5
+Iteration       6
+Iteration       7
+Iteration       8
+Iteration       9
+Iteration      10
+Iteration      10  Min/max ratio in y =   1.211371e    -3
+Iteration      10  Return to DP iterations
+Iteration      10  Min/max ratio in y =   1.211371e    -3
+Iteration      36  MP update
+Iteration      36  updtmp: MP update from DP arrays.
+Iteration      36  updtmp: Min, max of y =   5.390384e  -79   2.948279e  -75
+Iteration      36  Norm bound =   1.131256D+01    Max. bound =   1.131256D+01
+Iteration      36  Min/max ratio in y =   1.828315e    -4
+Iteration      83  MP update
+Iteration      83  updtmp: MP update from DP arrays.
+Iteration      83  updtmp: Min, max of y =   6.655553e  -90   1.571785e  -87
+Iteration      83  Norm bound =   1.131256D+01    Max. bound =   1.131256D+01
+Iteration      83  Min/max ratio in y =   4.234390e    -3
+Iteration     100
+Iteration     133  MP update
+Iteration     133  updtmp: MP update from DP arrays.
+Iteration     133  updtmp: Min, max of y =   2.375249e -102   1.203140e  -99
+Iteration     133  Norm bound =   1.131256D+01    Max. bound =   1.131256D+01
+Iteration     133  Min/max ratio in y =   1.974208e    -3
+Iteration     195  MP update
+Iteration     195  updtmp: MP update from DP arrays.
+Iteration     195  updtmp: Min, max of y =   1.907163e -114   1.447110e -111
+Iteration     195  Norm bound =   1.131256D+01    Max. bound =   1.131256D+01
+Iteration     195  Min/max ratio in y =   1.317912e    -3
+Iteration     200
+Iteration     251  MP update
+Iteration     251  updtmp: MP update from DP arrays.
+Iteration     251  updtmp: Min, max of y =   5.497012e -126   4.579462e -123
+Iteration     251  Norm bound =   1.259080D+01    Max. bound =   1.259080D+01
+Iteration     251  Min/max ratio in y =   1.200362e    -3
+Iteration     300
+Iteration     315  MP update
+Iteration     315  updtmp: MP update from DP arrays.
+Iteration     315  updtmp: Min, max of y =   1.038085e -136   3.903899e -134
+Iteration     315  Norm bound =   1.609618D+01    Max. bound =   1.609618D+01
+Iteration     315  Min/max ratio in y =   2.659097e    -3
+Iteration     380  MP update
+Iteration     380  updtmp: MP update from DP arrays.
+Iteration     380  updtmp: Min, max of y =   1.605234e -147   2.600587e -145
+Iteration     380  Norm bound =   1.994888D+01    Max. bound =   1.994888D+01
+Iteration     380  Min/max ratio in y =   6.172583e    -3
+Iteration     400
+Iteration     443  MP update
+Iteration     443  updtmp: MP update from DP arrays.
+Iteration     443  updtmp: Min, max of y =   3.861978e -159   6.991211e -157
+Iteration     443  Norm bound =   3.451580D+01    Max. bound =   3.451580D+01
+Iteration     443  Min/max ratio in y =   5.524048e    -3
+Iteration     500
+Iteration     504  MP update
+Iteration     504  updtmp: MP update from DP arrays.
+Iteration     504  updtmp: Min, max of y =   5.875411e -170   2.772534e -166
+Iteration     504  Norm bound =   4.909047D+01    Max. bound =   4.909047D+01
+Iteration     504  Min/max ratio in y =   2.119148e    -4
+Iteration     555  MP update
+Iteration     555  updtmp: MP update from DP arrays.
+Iteration     555  updtmp: Min, max of y =   1.258735e -180   7.536825e -177
+Iteration     555  Norm bound =   6.499176D+01    Max. bound =   6.499176D+01
+Iteration     555  Min/max ratio in y =   1.670113e    -4
+Iteration     600
+Iteration     617  MP update
+Iteration     617  updtmp: MP update from DP arrays.
+Iteration     617  updtmp: Min, max of y =   8.424075e -191   2.147610e -188
+Iteration     617  Norm bound =   1.102794D+02    Max. bound =   1.102794D+02
+Iteration     617  Min/max ratio in y =   3.922535e    -3
+Iteration     670  MP update
+Iteration     670  updtmp: MP update from DP arrays.
+Iteration     670  updtmp: Min, max of y =   6.957359e -203   5.185062e -199
+Iteration     670  Norm bound =   2.014705D+02    Max. bound =   2.014705D+02
+Iteration     670  Min/max ratio in y =   1.341808e    -4
+Iteration     700
+Iteration     726  MP update
+Iteration     726  updtmp: MP update from DP arrays.
+Iteration     726  updtmp: Min, max of y =   8.023032e -213   7.397108e -210
+Iteration     726  Norm bound =   3.508003D+02    Max. bound =   3.508003D+02
+Iteration     726  Min/max ratio in y =   1.084617e    -3
+Iteration     800
+Iteration     805  MP update
+Iteration     805  updtmp: MP update from DP arrays.
+Iteration     805  updtmp: Min, max of y =   1.755805e -223   2.095348e -221
+Iteration     805  Norm bound =   6.036373D+02    Max. bound =   6.036373D+02
+Iteration     805  Min/max ratio in y =   8.379538e    -3
+Iteration     855  MP update
+Iteration     855  updtmp: MP update from DP arrays.
+Iteration     855  updtmp: Min, max of y =   1.206175e -235   1.700085e -231
+Iteration     855  Norm bound =   8.926313D+02    Max. bound =   8.926313D+02
+Iteration     855  Min/max ratio in y =   7.094790e    -5
+Iteration     900
+Iteration     922  MP update
+Iteration     922  updtmp: MP update from DP arrays.
+Iteration     922  updtmp: Min, max of y =   2.098871e -245   5.293456e -243
+Iteration     922  Norm bound =   1.232528D+03    Max. bound =   1.232528D+03
+Iteration     922  Min/max ratio in y =   3.965030e    -3
+Iteration     974  MP update
+Iteration     974  updtmp: MP update from DP arrays.
+Iteration     974  updtmp: Min, max of y =   5.267419e -257   2.089454e -254
+Iteration     974  Norm bound =   1.788567D+03    Max. bound =   1.788567D+03
+Iteration     974  Min/max ratio in y =   2.520955e    -3
+Iteration    1000
+Iteration    1060  MP update
+Iteration    1060  updtmp: MP update from DP arrays.
+Iteration    1060  updtmp: Min, max of y =   4.299945e -268   3.297259e -265
+Iteration    1060  Norm bound =   3.130835D+03    Max. bound =   3.130835D+03
+Iteration    1060  Min/max ratio in y =   1.304097e    -3
+Iteration    1100
+Iteration    1117  MP update
+Iteration    1117  updtmp: MP update from DP arrays.
+Iteration    1117  updtmp: Min, max of y =   1.216735e -279   2.005039e -276
+Iteration    1117  Norm bound =   4.991601D+03    Max. bound =   4.991601D+03
+Iteration    1117  Min/max ratio in y =   6.068386e    -4
+Iteration    1167  MP update
+Iteration    1167  updtmp: MP update from DP arrays.
+Iteration    1167  updtmp: Min, max of y =   4.953546e -290   7.442199e -287
+Iteration    1167  Norm bound =   6.200804D+03    Max. bound =   6.200804D+03
+Iteration    1167  Min/max ratio in y =   6.656025e    -4
+Iteration    1200
+Iteration    1231  MP update
+Iteration    1231  updtmp: MP update from DP arrays.
+Iteration    1231  updtmp: Min, max of y =   4.657177e -301   1.831338e -297
+Iteration    1231  Norm bound =   1.098685D+04    Max. bound =   1.098685D+04
+Iteration    1231  Min/max ratio in y =   2.543047e    -4
+Iteration    1297  MP update
+Iteration    1297  updtmp: MP update from DP arrays.
+Iteration    1297  updtmp: Min, max of y =   1.898710e -311   1.883773e -308
+Iteration    1297  Norm bound =   1.475169D+04    Max. bound =   1.475169D+04
+Iteration    1297  Min/max ratio in y =   1.007929e    -3
+Iteration    1300
+Iteration    1353  MP update
+Iteration    1353  updtmp: MP update from DP arrays.
+Iteration    1353  updtmp: Min, max of y =   1.411199e -322   2.987580e -319
+Iteration    1353  Norm bound =   3.126666D+04    Max. bound =   3.126666D+04
+Iteration    1353  Min/max ratio in y =   4.723554e    -4
+Iteration    1400
+Iteration    1420  MP update
+Iteration    1420  updtmp: MP update from DP arrays.
+Iteration    1420  updtmp: Min, max of y =   2.356188e -333   1.419877e -330
+Iteration    1420  Norm bound =   4.122359D+04    Max. bound =   4.122359D+04
+Iteration    1420  Min/max ratio in y =   1.659431e    -3
+Iteration    1473  MP update
+Iteration    1473  updtmp: MP update from DP arrays.
+Iteration    1473  updtmp: Min, max of y =   8.926849e -345   1.979144e -340
+Iteration    1473  Norm bound =   6.594330D+04    Max. bound =   6.594330D+04
+Iteration    1473  Min/max ratio in y =   4.510461e    -5
+Iteration    1500
+Iteration    1530  MP update
+Iteration    1530  updtmp: MP update from DP arrays.
+Iteration    1530  updtmp: Min, max of y =   3.980103e -355   1.083484e -351
+Iteration    1530  Norm bound =   9.195262D+04    Max. bound =   9.195262D+04
+Iteration    1530  Min/max ratio in y =   3.673430e    -4
+Iteration    1582  MP update
+Iteration    1582  updtmp: MP update from DP arrays.
+Iteration    1582  updtmp: Min, max of y =   7.135488e -366   3.617859e -362
+Iteration    1582  Norm bound =   1.474468D+05    Max. bound =   1.474468D+05
+Iteration    1582  Min/max ratio in y =   1.972296e    -4
+Iteration    1600
+Iteration    1657  MP update
+Iteration    1657  updtmp: MP update from DP arrays.
+Iteration    1657  updtmp: Min, max of y =   5.409046e -376   8.270861e -374
+Iteration    1657  Norm bound =   2.795661D+05    Max. bound =   2.795661D+05
+Iteration    1657  Min/max ratio in y =   6.539882e    -3
+Iteration    1700
+Iteration    1717  MP update
+Iteration    1717  updtmp: MP update from DP arrays.
+Iteration    1717  updtmp: Min, max of y =   1.156770e -387   2.197168e -384
+Iteration    1717  Norm bound =   4.025851D+05    Max. bound =   4.025851D+05
+Iteration    1717  Min/max ratio in y =   5.264824e    -4
+Iteration    1785  MP update
+Iteration    1785  updtmp: MP update from DP arrays.
+Iteration    1785  updtmp: Min, max of y =   1.610973e -398   2.235486e -396
+Iteration    1785  Norm bound =   6.549761D+05    Max. bound =   6.549761D+05
+Iteration    1785  Min/max ratio in y =   7.206364e    -3
+Iteration    1800
+Iteration    1851  MP update
+Iteration    1851  updtmp: MP update from DP arrays.
+Iteration    1851  updtmp: Min, max of y =   1.574988e -411   3.324001e -407
+Iteration    1851  Norm bound =   1.061827D+06    Max. bound =   1.061827D+06
+Iteration    1851  Min/max ratio in y =   4.738229e    -5
+Iteration    1900
+Iteration    1911  MP update
+Iteration    1911  updtmp: MP update from DP arrays.
+Iteration    1911  updtmp: Min, max of y =   2.039711e -421   1.616970e -418
+Iteration    1911  Norm bound =   1.958768D+06    Max. bound =   1.958768D+06
+Iteration    1911  Min/max ratio in y =   1.261440e    -3
+Iteration    1972  MP update
+Iteration    1972  updtmp: MP update from DP arrays.
+Iteration    1972  updtmp: Min, max of y =   6.751319e -432   2.740333e -429
+Iteration    1972  Norm bound =   2.832913D+06    Max. bound =   2.832913D+06
+Iteration    1972  Min/max ratio in y =   2.463686e    -3
+Iteration    2000
+Iteration    2025  MP update
+Iteration    2025  updtmp: MP update from DP arrays.
+Iteration    2025  updtmp: Min, max of y =   4.480013e -443   7.826505e -439
+Iteration    2025  Norm bound =   3.776645D+06    Max. bound =   3.776645D+06
+Iteration    2025  Min/max ratio in y =   5.724155e    -5
+Iteration    2076  MP update
+Iteration    2076  updtmp: MP update from DP arrays.
+Iteration    2076  updtmp: Min, max of y =   7.214523e -453   2.764806e -449
+Iteration    2076  Norm bound =   5.518483D+06    Max. bound =   5.518483D+06
+Iteration    2076  Min/max ratio in y =   2.609414e    -4
+Iteration    2100
+Iteration    2136  MP update
+Iteration    2136  updtmp: MP update from DP arrays.
+Iteration    2136  updtmp: Min, max of y =   5.281977e -463   3.315433e -460
+Iteration    2136  Norm bound =   1.067674D+07    Max. bound =   1.067674D+07
+Iteration    2136  Min/max ratio in y =   1.593148e    -3
+Iteration    2200
+Iteration    2209  MP update
+Iteration    2209  updtmp: MP update from DP arrays.
+Iteration    2209  updtmp: Min, max of y =   8.236063e -474   2.799500e -471
+Iteration    2209  Norm bound =   1.792335D+07    Max. bound =   1.792335D+07
+Iteration    2209  Min/max ratio in y =   2.941976e    -3
+Iteration    2275  MP update
+Iteration    2275  updtmp: MP update from DP arrays.
+Iteration    2275  updtmp: Min, max of y =   2.214610e -485   7.191895e -483
+Iteration    2275  Norm bound =   2.158836D+07    Max. bound =   2.158836D+07
+Iteration    2275  Min/max ratio in y =   3.079314e    -3
+Iteration    2300
+Iteration    2332  MP update
+Iteration    2332  updtmp: MP update from DP arrays.
+Iteration    2332  updtmp: Min, max of y =   1.611694e -497   7.688206e -493
+Iteration    2332  Norm bound =   4.409378D+07    Max. bound =   4.409378D+07
+Iteration    2332  Min/max ratio in y =   2.096320e    -5
+Iteration    2387  MP update
+Iteration    2387  updtmp: MP update from DP arrays.
+Iteration    2387  updtmp: Min, max of y =   2.787587e -507   3.044010e -504
+Iteration    2387  Norm bound =   5.723988D+07    Max. bound =   5.723988D+07
+Iteration    2387  Min/max ratio in y =   9.157616e    -4
+Iteration    2400
+Iteration    2457  MP update
+Iteration    2457  updtmp: MP update from DP arrays.
+Iteration    2457  updtmp: Min, max of y =   4.269495e -519   1.395221e -515
+Iteration    2457  Norm bound =   7.784998D+07    Max. bound =   7.784998D+07
+Iteration    2457  Min/max ratio in y =   3.060085e    -4
+Iteration    2500
+Iteration    2520  MP update
+Iteration    2520  updtmp: MP update from DP arrays.
+Iteration    2520  updtmp: Min, max of y =   1.835189e -529   1.051113e -526
+Iteration    2520  Norm bound =   1.245330D+08    Max. bound =   1.245330D+08
+Iteration    2520  Min/max ratio in y =   1.745949e    -3
+Iteration    2586  MP update
+Iteration    2586  updtmp: MP update from DP arrays.
+Iteration    2586  updtmp: Min, max of y =   1.551971e -539   1.315809e -537
+Iteration    2586  Norm bound =   1.872818D+08    Max. bound =   1.872818D+08
+Iteration    2586  Min/max ratio in y =   1.179480e    -2
+Iteration    2600
+Iteration    2650  MP update
+Iteration    2650  updtmp: MP update from DP arrays.
+Iteration    2650  updtmp: Min, max of y =   7.305580e -552   2.975695e -549
+Iteration    2650  Norm bound =   3.287326D+08    Max. bound =   3.287326D+08
+Iteration    2650  Min/max ratio in y =   2.455083e    -3
+Iteration    2700
+Iteration    2715  MP update
+Iteration    2715  updtmp: MP update from DP arrays.
+Iteration    2715  updtmp: Min, max of y =   3.286173e -563   6.100221e -560
+Iteration    2715  Norm bound =   5.080659D+08    Max. bound =   5.080659D+08
+Iteration    2715  Min/max ratio in y =   5.386973e    -4
+Iteration    2775  MP update
+Iteration    2775  updtmp: MP update from DP arrays.
+Iteration    2775  updtmp: Min, max of y =   1.342079e -573   5.869557e -571
+Iteration    2775  Norm bound =   9.359776D+08    Max. bound =   9.359776D+08
+Iteration    2775  Min/max ratio in y =   2.286509e    -3
+Iteration    2800
+Iteration    2838  MP update
+Iteration    2838  updtmp: MP update from DP arrays.
+Iteration    2838  updtmp: Min, max of y =   1.341098e -584   1.327161e -582
+Iteration    2838  Norm bound =   1.454785D+09    Max. bound =   1.454785D+09
+Iteration    2838  Min/max ratio in y =   1.010502e    -2
+Iteration    2892  MP update
+Iteration    2892  updtmp: MP update from DP arrays.
+Iteration    2892  updtmp: Min, max of y =   2.100481e -596   7.770167e -593
+Iteration    2892  Norm bound =   2.086346D+09    Max. bound =   2.086346D+09
+Iteration    2892  Min/max ratio in y =   2.703264e    -4
+Iteration    2900
+Iteration    2917  MP update
+Iteration    2917  updtmp: MP update from DP arrays.
+Iteration    2917  updtmp: Min, max of y =   4.784887e -700   1.989311e -596
+Iteration    2917  updtmp: Small value in y =   4.784887e -700
+Iteration    2917  Norm bound =   2.658192D+09    Max. bound =   2.658192D+09
+Iteration    2917  Relation detected
+Min, max of y =   4.784887e -700   1.989311e -596
+Max. bound =   2.658192D+09
+Index of relation =   9   Norm =   9.530666D+09   Residual =   4.784887e -700
+CPU times:
+        0.02        0.28        2.37        0.27
+
+Recovered relation: 0 =
+                                                          +6433. * 1
+                                                         -10752. * al^  1
+                                                        -330624. * al^  2
+                                                       -4523904. * al^  3
+                                                      -26535600. * al^  4
+                                                      -52744608. * al^  5
+                                                      -17513496. * al^  6
+                                                         -17496. * al^  7
+                                                           +448. * al^  8
+                                                       -3806208. * al^  9
+                                                     +337256640. * al^ 10
+                                                    -3329569152. * al^ 11
+                                                    +3802034376. * al^ 12
+                                                     -217020384. * al^ 13
+                                                         +20412. * al^ 14
+                                                           -672. * al^ 16
+                                                      -25366656. * al^ 17
+                                                    -2748602304. * al^ 18
+                                                    -7518801024. * al^ 19
+                                                     -358251012. * al^ 20
+                                                         -13608. * al^ 21
+                                                           +560. * al^ 24
+                                                      -25826304. * al^ 25
+                                                     +944957664. * al^ 26
+                                                     -132239520. * al^ 27
+                                                          +5670. * al^ 28
+                                                           -280. * al^ 32
+                                                       -5146848. * al^ 33
+                                                      -11195352. * al^ 34
+                                                          -1512. * al^ 35
+                                                            +84. * al^ 40
+                                                        -143808. * al^ 41
+                                                           +252. * al^ 42
+                                                            -14. * al^ 48
+                                                            -24. * al^ 49
+                                                             +1. * al^ 56
+CPU Time =      2.9824
+TEST PASSED

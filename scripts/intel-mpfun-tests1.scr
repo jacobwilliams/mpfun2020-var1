@@ -1,0 +1,30 @@
+echo "compiling library"
+./intel-complib1.scr
+echo "testmpfun"
+./intel-complink1.scr testmpfun
+./testmpfun > testmpfun.txt
+tail -1 testmpfun.txt
+echo "tpslq1"
+./intel-complink1.scr tpslq1
+./tpslq1 > tpslq1.txt
+tail -1 tpslq1.txt
+echo "tpslqm1"
+./intel-complink1.scr tpslqm1
+./tpslqm1 > tpslqm1.txt
+tail -1 tpslqm1.txt
+echo "tpslqm2"
+./intel-complink1.scr tpslqm2
+./tpslqm2 > tpslqm2.txt
+tail -1 tpslqm2.txt
+echo "tpslqm3"
+./intel-complink1.scr tpslqm3
+./tpslqm3 > tpslqm3.txt
+tail -1 tpslqm3.txt
+echo "tquad"
+./intel-complink1.scr tquad
+./tquad > tquad.txt
+tail -1 tquad.txt
+echo "tpphix3"
+./intel-complink1.scr tpphix3
+./tpphix3 > tpphix3.txt
+tail -1 tpphix3.txt

@@ -1,0 +1,5 @@
+ifort -fast -c mpfuna.f90 mpfunb.f90 mpfunc.f90 mpfund.f90 \
+  mpfune.f90 mpfunf.f90 mpfung1.f90 mpfunh1.f90 mpmodule.f90
+ifort -fast -c mpfuna.f90 mpfunb.f90 mpfunc.f90 mpfund.f90 \
+  mpfune.f90 mpfunf.f90 mpfung1.f90 mpfunh1.f90 mpmodule.f90
+ifort -fast -fp-model strict -c mpmask13.f90 second.f90

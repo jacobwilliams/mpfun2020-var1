@@ -1,0 +1,17 @@
+name = "mpfun2020-var1"
+author = "Jacob Williams"
+license = "BSD-3"
+description = "FPM Package for MPFUN2020 (var1)"
+homepage = "https://github.com/jacobwilliams/mpfun2020-var1"
+keywords = ["arbitrary precision"]
+
+[build]
+auto-executables = false
+auto-examples = false
+auto-tests = true
+
+[library]
+source-dir = "src"
+
+[install]
+library = true

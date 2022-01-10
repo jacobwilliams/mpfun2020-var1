@@ -1,0 +1,2 @@
+ifort -fast -heap-arrays -o $1 $1.f90 mpfuna.o mpfunb.o mpfunc.o mpfund.o \
+  mpfune.o mpfunf.o mpfung1.o mpfunh1.o mpmodule.o mpmask13.o second.o
