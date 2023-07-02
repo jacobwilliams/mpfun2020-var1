@@ -32,15 +32,15 @@
 !    and testing this program on various specific systems are included in the
 !    README file accompanying this package, and, in more detail, in the
 !    following technical paper:
-   
-!    David H. Bailey, "MPFUN2020: A new thread-safe arbitrary precision package," 
+
+!    David H. Bailey, "MPFUN2020: A new thread-safe arbitrary precision package,"
 !    available at http://www.davidhbailey.com/dhbpapers/mpfun2020.pdf.
 
 !  DESCRIPTION OF THIS MODULE (MPMODULE):
 !    This module links all lower-level modules and is the connection between
 !    user codes and the lower modules. It also declares as private routines in
 !    lower-level modules that are not intended to be called directly by the user.
-!    See documentation for details. 
+!    See documentation for details.
 
 module mpmodule
 
@@ -77,7 +77,7 @@ private &
 
 private &
   mpinitwds, mpabs, mpneg, mpsigntr, mpwprecr, mpspacer, mpberner, mppolyadd, &
-  mppolysub, mppolydiv, mpbesselinr, mpbesseljnr, mpbesselknr, mpbesselynr, &
+  mppolysub, mpbesselinr, mpbesseljnr, mpbesselknr, mpbesselynr, &
   mperfr, mperfcr, mpgammar, mpincgammar, mppolylogini, mppolylogneg, &
   mppolylogpos, mpzetar, mpzetaemr, mpzetaintr
 

@@ -48,6 +48,8 @@
 
 module mpfunb
 use mpfuna
+use mpmask
+
 implicit none
 
 contains
@@ -258,7 +260,7 @@ call mpsqrt (s2, s0, mpnw1)
 call mproun (s0, mpnw)
 call mpeq (s0, b, mpnw)
 
-return 
+return
 end subroutine mpcabs
 
 subroutine mpcadd (a, b, c, mpnw)
@@ -949,7 +951,7 @@ do i = 0, na
 enddo
 
 d(2*na+6:2*mpnw+10) = 0
-b1 = shifta (ibb, nbth) 
+b1 = shifta (ibb, nbth)
 b2 = ibb - shiftl (b1, nbth)
 
 !   Perform short division algorithm, after splitting inputs.
@@ -1030,8 +1032,8 @@ real (mprknd), intent(in):: b
 real (mprknd) t2
 integer (mpiknd), intent(in):: a(0:)
 integer (mpiknd), intent(out):: c(0:)
-real (mprknd) mpmask13
-external mpmask13
+!real (mprknd) mpmask13
+!external mpmask13
 
 ! End of declaration
 
@@ -1164,8 +1166,8 @@ integer, intent(in):: mpnw, n
 real (mprknd), intent(in):: a
 real (mprknd) t2
 integer (mpiknd), intent(out):: b(0:)
-real (mprknd) mpmask13
-external mpmask13
+!real (mprknd) mpmask13
+!external mpmask13
 
 ! End of declaration
 
@@ -1705,8 +1707,8 @@ real (mprknd), intent(in):: b
 real (mprknd) t2
 integer (mpiknd), intent(in):: a(0:)
 integer (mpiknd), intent(out):: c(0:)
-real (mprknd) mpmask13
-external mpmask13
+! real (mprknd) mpmask13
+! external mpmask13
 
 ! End of declaration
 
@@ -2539,7 +2541,7 @@ if (mprknd2 < 0) then
 2 format ('*** MPMQC: IEEE quad precision is not supported on this processor')
   call mpabrt (92)
 endif
-  
+
 if (a(2) == 0.d0)  then
   b = 0.d0
   n = 0
@@ -2603,7 +2605,7 @@ if (mprknd2 < 0) then
 2 format ('*** MPQMC: IEEE quad precision is not supported on this processor')
   call mpabrt (92)
 endif
-  
+
 !   Check for zero.
 
 if (a == 0.d0) then
@@ -2686,8 +2688,8 @@ parameter (knd = max (mprknd2, kind (1.0)))
 real (knd), intent(in):: a
 real (knd) t2
 integer (mpiknd), intent(out):: b(0:)
-real (knd) mpmask23
-external mpmask23
+! real (knd) mpmask23
+! external mpmask23
 
 ! End of declaration
 
@@ -2802,7 +2804,7 @@ subroutine mpfftrc (is, m, n, nsq, x, y)
 !   This routine is not intended to be called directly by the user.
 
 implicit none
-integer, intent(in):: is, m, n, nsq 
+integer, intent(in):: is, m, n, nsq
 integer k, ku, mx, n1, n2, n4
 real (mprknd), intent(in):: x(n)
 complex (mprknd), intent(out):: y(n/2+nsq*mpnsp1+1)

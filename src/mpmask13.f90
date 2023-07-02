@@ -1,5 +1,9 @@
 !*****************************************************************************
 
+module mpmask
+
+contains
+
 function mpmask13 (b)
 
 !  Revision date:  31 May 2021
@@ -34,7 +38,7 @@ end
 function mpmask23 (b)
 
 !  PURPOSE OF THIS ROUTINE:
-!    This convoluted-looking code tests whether the QP (IEEE quad) value B has more 
+!    This convoluted-looking code tests whether the QP (IEEE quad) value B has more
 !    than 90 significant bits. It actually returns the absolute value of B, with
 !    lower 23 bits zeroed out. This function must be compiled separately, with lower
 !    optimization, since compiling with -fast with gfortran, for instance, defeats
@@ -50,3 +54,5 @@ t1 = b23x * abs (b)
 mpmask23 = abs (abs (b) + t1) - abs (t1)
 return
 end
+
+end module mpmask
