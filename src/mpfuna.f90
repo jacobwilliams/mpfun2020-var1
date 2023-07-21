@@ -1,9 +1,9 @@
 !*****************************************************************************
 
-!  MPFUN20-Fort: A thread-safe arbitrary precision computation package
+!  MPFUN20-Fort: A thread-safe arbitrary precision package with special functions
 !  Global data definition module (module MPFUNA)
 
-!  Revision date:  14 Nov 2021
+!  Revision date:  22 May 2023
 
 !  AUTHOR:
 !    David H. Bailey
@@ -11,15 +11,15 @@
 !    Email: dhbailey@lbl.gov
 
 !  COPYRIGHT AND DISCLAIMER:
-!    All software in this package (c) 2021 David H. Bailey.
+!    All software in this package (c) 2023 David H. Bailey.
 !    By downloading or using this software you agree to the copyright, disclaimer
 !    and license agreement in the accompanying file DISCLAIMER.txt.
 
 !  PURPOSE OF PACKAGE:
 !    This package permits one to perform floating-point computations (real and
 !    complex) to arbitrarily high numeric precision, by making only relatively
-!    minor changes to existing Fortran-90 programs.  All basic arithmetic
-!    operations and transcendental functions are supported, together with several
+!    minor changes to existing Fortran-90 programs. All basic arithmetic
+!    operations and transcendental functions are supported, together with numerous
 !    special functions.
 
 !    In addition to fast execution times, one key feature of this package is a
@@ -38,7 +38,7 @@
 
 !  DESCRIPTION OF THIS MODULE (MPFUNA):
 !    This module contains some global parameter definitions, including data
-!    statements for log(2) and pi.  See documentation for details.
+!    statements for log(2) and pi. See documentation for details.
 
 module mpfuna
 
@@ -60,13 +60,17 @@ module mpfuna
 !   mpnbt        60    Number of mantissa bits per long integer word in MP numbers.
 !   mpnstr     2048    Maximum length of certain input character strings.
 !                      See usage in mpinp of module MPFUNC.
+!   mpnwm         4    Min precision in words (roughly 70 digits).
+!   mpnwx    200000    Max precision in words (enough for over one million digits).
 !   mpoutl       80    Length of output lines. See usage in mpout of MPFUNC.
-!   mprknd        8    Kind parameter for double floats (usually 8).
+!   mprknd   varies    Kind parameter for double floats (usually 8).
 !                      This is set automatically by the selected_real_kind function.
-!   mprknd2      16    Kind parameter for IEEE quad floats (if available; usually 16).
+!   mpdknd             = mprknd
+!   mprknd2  varies    Kind parameter for IEEE quad floats (if available; usually 16).
 !                      This is set automatically by the selected_real_kind function.
 !                      If IEEE quad (128-bit) is not supported on the processor,
 !                      then selected_real_kind sets mprknd2 = -1.
+!   mpqknd             = mprknd2
 
 !   Long integer constants:
 !   Name     Default   Description
@@ -77,10 +81,11 @@ module mpfuna
 !   mpdpw  Log10(2^60) DP approximation to number of digits per mantissa word.
 !   mpexpmx   2^31/60  Largest permissible exponent, corresponding to a maximum
 !                      binary exponent of 2^31.
+!   mplogb   Log(2^60) DP approximation to log (mpbdx).
 !   mprdfz    1/2^50   "Fuzz" for comparing DP values.
 !   mprandx  5501758857861179  Multiplier for pseudorandom number generator.
 
-!   Integer parameters for FFT, log(2) and pi:
+!   Integer parameters for FFT, log(2), pi and egamma arrays:
 !   mplconx    100000  Max size of log(2) and pi arrays. This is large enough to
 !                      support precision levels over one million digits.
 !   mplfftx   2100000  Max size of FFT arrays. This is large enough to support
@@ -90,36 +95,29 @@ module mpfuna
 !   mpnsp2          9  Spacing parameter #2 for FFT.
 
 implicit none
-integer, public:: mpiknd, mpiknd2, mpldb, mpmlxm, mpl2pi, mpndpw, mpnbt, mpnstr, &
-  mpoutl, mprknd, mprknd2
-parameter (mpiknd = selected_int_kind (18), mpldb = 6, mpmlxm = 1111, mpl2pi = 1111, &
-  mpndpw = 15, mpnbt = 60, mpnstr = 2048, mpoutl = 80, &
-  mprknd = selected_real_kind (15, 307), &
-  mprknd2 = selected_real_kind (33, 4931))
-integer (mpiknd), public:: mpbdx
-parameter (mpbdx = 2_mpiknd**mpnbt)
-real (mprknd), public:: mpdpw, mpexpmx, mprdfz, mpb13x, mprandx
-parameter (mpdpw = 18.061799739838871713d0, mpexpmx = 2.d0**31 / mpnbt, &
-  mprdfz = 0.5d0**50, mprandx = 5501758857861179.d0)
-integer, public:: mplconx, mplfftx, mpnrow, mpnsp1, mpnsp2
-parameter (mplconx = 100000, mplfftx = 2100000, mpnrow = 16, mpnsp1 = 2, mpnsp2 = 9)
+integer, public, parameter:: mpiknd = selected_int_kind (18), mpldb = 6, &
+  mpmlxm = 1111, mpl2pi = 1111, mpndpw = 15, mpnbt = 60, mpnstr = 2048, &
+  mpnwm = 4, mpnwx = 200000, mpoutl = 80, &
+  mprknd = selected_real_kind (15, 307), mprknd2 = selected_real_kind (33, 4931), &
+  mpdknd = mprknd, mpqknd = mprknd2
+integer (mpiknd), public, parameter:: mpbdx = 2_mpiknd**mpnbt
+real (mprknd), public, parameter:: mpdpw = 18.061799739838871713d0, &
+  mpexpmx = 2.d0**31 / mpnbt, mplogb = 41.5888308335967186d0, mprdfz = 0.5d0**50, &
+  mprandx = 5501758857861179.d0
 
-!  These two lines are for debug and timing (for internal use only):
+!  This is FFT data for the extra-high precision routines for over 20,000 digits
+!  (by default). To initialize, call mpinifft or mpinit (in module MPFUNG) at start.
 
-integer, dimension(10):: mpdeb = 0
-real (mprknd), dimension(10):: mptm = 0.d0
-
-!  This is FFT data for the extra-high precision routines (for over 20,000 digits).
-!  by default). To initialize, call mpinifft or mpinit (in module MPFUNG) at start.
-
+integer, public, parameter:: mplconx = 100000, mplfftx = 2100000, mpnrow = 16, &
+  mpnsp1 = 2, mpnsp2 = 9
 complex (mprknd), public:: mpuu1(mplfftx), mpuu2(mplfftx)
 
-!  The following data arrays contain the values of log(2) and pi to mpl2pi words or
+!  The following data arrays contain the values of log(2), pi and egamma to mpl2pi words or
 !  roughly 20,000 digits (by default). For higher precision, call mpinitran or mpinit.
 
 integer (mpiknd), public:: mplog2con(0:mplconx-1), mppicon(0:mplconx-1), mpegammacon(0:mplconx-1)
-integer, private:: i, i8
-parameter (i8 = mpiknd)
+integer, private, parameter:: i8 = mpiknd
+integer, private:: i
 
 !  ALL lines from this point on, except for the "end module" statement at the end,
 !  are generated by the compcon.f90 program, available from author.

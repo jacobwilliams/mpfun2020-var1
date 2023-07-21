@@ -2,7 +2,7 @@
 
 !  program tquadgs
 
-!  Revision date:  24 Sep 2021
+!  Revision date:    7 Jan 2023
 
 !  AUTHOR:
 !   David H. Bailey
@@ -10,12 +10,12 @@
 !   Email: dhbailey@lbl.gov
 
 !  COPYRIGHT AND DISCLAIMER:
-!   All software in this package (c) 2021 David H. Bailey.
+!   All software in this package (c) 2023 David H. Bailey.
 !   By downloading or using this software you agree to the copyright, disclaimer
 !   and license agreement in the accompanying file DISCLAIMER.txt.
 
-!  NOTE: This program runs very long (800 seconds with MPFUN-MPFR or 2400 seconds
-!   with MPFUN-Fort, on the author's computer).
+!  NOTE: This program runs quite long (800 seconds with MPFUN20-MPFR or 1000 seconds
+!   with MPFUN20-Fort, on the author's computer).
 
 !  DESCRIPTION:
 !   This program demonstrates the quadrature routine 'quadgs', which employs the
@@ -96,18 +96,17 @@
 program tquadgs
 use mpmodule
 implicit none
-integer i, i1, i2, idata, ndp1, ndp2, neps1, neps2, nq1, nq2, nwds1, nwds2, n1
-parameter (idata = 1, ndp1 = 500, ndp2 = 1000, neps1 = -ndp1, neps2 = -ndp2, &
-  nq1 = 11, nq2 = 6 * 2 ** nq1 + 100, nwds1 = int (ndp1 / mpdpw + 2), &
-  nwds2 = int (ndp2 / mpdpw + 2))
+integer, parameter:: idata = 1, ndp1 = 500, ndp2 = 1000, neps1 = -ndp1, &
+  neps2 = -ndp2, nq1 = 11, nq2 = 6 * 2 ** nq1 + 100, &
+  nwds1 = int (ndp1 / mpdpw + 2), nwds2 = int (ndp2 / mpdpw + 2)
+type (mp_real), external:: quadgs, fun01, fun02, fun03, fun04, fun15, fun16, &
+  fun17, fun18 
+real (mprknd), external:: second
+integer i, i1, i2, n1
 character*32 chr32
-real (mprknd) d1, second, tm0, tm1, tm2
-type (mp_real) err, errmx, quadgs, fun01, fun02, fun03, fun04, &
-  fun15, fun16, fun17, fun18, one, t1, t2, wkgs(-1:nq2), xkgs(-1:nq2), &
-  wkgu(-1:nq2), xkgu(-1:nq2), zero
-type (mp_real) mppic, mpl02, x1, x2
-external fun01, fun02, fun03, fun04, fun15, fun16, fun17, fun18, &
-  quadgs, second
+real (mprknd) d1, tm0, tm1, tm2
+type (mp_real) err, errmx, one, t1, t2, wkgs(-1:nq2), xkgs(-1:nq2), &
+  wkgu(-1:nq2), xkgu(-1:nq2), zero, mppic, mpl02, x1, x2
 
 !   Check to see if default precision is high enough.
 
@@ -325,128 +324,128 @@ else
 endif
 
 stop
-end
+end program tquadgs
 
 !   Function definitions:
 
-function fun01 (t, nwds1, nwds2)
+type (mp_real) function fun01 (t, nwds1, nwds2)
 
 !   fun01(t) = t * log(1+t)
 
 use mpmodule
 implicit none
-integer nwds1, nwds2
-type (mp_real) fun01, t1
-type (mp_real) t
+integer, intent(in):: nwds1, nwds2
+type (mp_real), intent(in):: t
+type (mp_real) t1
 
 t1 = mpreal (t, nwds1)
 fun01 = t1 * log (1.d0 + t1)
 return
-end
+end function fun01
 
-function fun02 (t, nwds1, nwds2)
+type (mp_real) function fun02 (t, nwds1, nwds2)
 
 !   fun02(t) = t^2 * arctan(t)
 
 use mpmodule
 implicit none
-integer nwds1, nwds2
-type (mp_real) fun02, t1
-type (mp_real) t
+integer, intent(in):: nwds1, nwds2
+type (mp_real), intent(in):: t
+type (mp_real) t1
 
 t1 = mpreal (t, nwds1)
 fun02 = t1 ** 2 * atan (t1)
 return
-end
+end function fun02
 
-function fun03 (t, nwds1, nwds2)
+type (mp_real) function fun03 (t, nwds1, nwds2)
 
 !   fun03(t) = e^t * cos(t)
 
 use mpmodule
 implicit none
-integer nwds1, nwds2
-type (mp_real) fun03, t1
-type (mp_real) t
+integer, intent(in):: nwds1, nwds2
+type (mp_real), intent(in):: t
+type (mp_real) t1
 
 t1 = mpreal (t, nwds1)
 fun03 = exp(t1) * cos(t1)
 return
-end
+end function fun03
 
-function fun04 (t, nwds1, nwds2)
+type (mp_real) function fun04 (t, nwds1, nwds2)
 
 !   fun04(t) = arctan(sqrt(2+t^2))/((1+t^2)sqrt(2+t^2))
 
 use mpmodule
 implicit none
-integer nwds1, nwds2
-type (mp_real) fun04, t1, t2
-type (mp_real) t
+integer, intent(in):: nwds1, nwds2
+type (mp_real), intent(in):: t
+type (mp_real) t1, t2
 
 t1 = mpreal (t, nwds1)
 t2 = sqrt (2.d0 + t1**2)
 fun04 = atan(t2) / ((1.d0 + t1**2) * t2)
 return
-end
+end function fun04
 
-function fun15 (t, nwds1, nwds2)
+type (mp_real) function fun15 (t, nwds1, nwds2)
 
 !   fun15(t) = 1 / (1 + t^2)
 
 use mpmodule
 implicit none
-integer nwds1, nwds2
-type (mp_real) t, fun15
+integer, intent(in):: nwds1, nwds2
+type (mp_real), intent(in):: t
 
 fun15 = 1.d0 / (1.d0 + t**2)
 return
-end
+end function fun15
 
-function fun16 (t, nwds1, nwds2)
+type (mp_real) function fun16 (t, nwds1, nwds2)
 
 !   fun16(t) = 1 / (1 + t^4)
 
 use mpmodule
 implicit none
-integer nwds1, nwds2
-type (mp_real) t, fun16
+integer, intent(in):: nwds1, nwds2
+type (mp_real), intent(in):: t
 
 fun16 = 1.d0 / (1.d0 + t**4)
 return
-end
+end function fun16
 
-function fun17 (t, nwds1, nwds2)
+type (mp_real) function fun17 (t, nwds1, nwds2)
 
 !   fun17(t) = exp(-1/2*t^2)
 
 use mpmodule
 implicit none
-integer nwds1, nwds2
-type (mp_real) t, fun17
+integer, intent(in):: nwds1, nwds2
+type (mp_real), intent(in):: t
 
 fun17 = exp (-0.5d0 * t**2)
 return
-end
+end function fun17
 
-function fun18 (t, nwds1, nwds2)
+type (mp_real) function fun18 (t, nwds1, nwds2)
 
 !   fun18(t) = exp(-1/2*t^2) * cos(t)
 
 use mpmodule
 implicit none
-integer nwds1, nwds2
-type (mp_real) t, fun18
+integer, intent(in):: nwds1, nwds2
+type (mp_real), intent(in):: t
 
 fun18 = exp (-0.5d0 * t**2) * cos (t)
 return
-end
+end function fun18
 
 !   Gaussian quadrature routines:
 
 subroutine initqgs (nq1, nq2, nwds1, wkgs, xkgs, wkgu, xkgu)
 
-!   David H Bailey    24 Sep 2021
+!   David H Bailey   7 Jan 2023
 
 !   This subroutine initializes the quadrature arrays wkgs and xkgs for standard
 !   Gaussian quadrature, and also wkgu and xkgu for quadrature over the real line.
@@ -475,11 +474,12 @@ subroutine initqgs (nq1, nq2, nwds1, wkgs, xkgs, wkgu, xkgu)
 
 use mpmodule
 implicit none
-integer i, ik0, iprint, j, j1, k, n, ndebug, nq1, nq2, nwds1, nwp
-real (mprknd) dpi
-parameter (ik0 = 100, iprint = 1, ndebug = 2, dpi = 3.141592653589793238d0)
-type (mp_real) eps, pi2, r, t1, t2, t3, t4, t5, wkgs(-1:nq2), xkgs(-1:nq2), &
-  wkgu(-1:nq2), xkgu(-1:nq2), zero
+integer, intent(in):: nq1, nq2, nwds1
+type (mp_real), intent(out):: wkgs(-1:nq2), xkgs(-1:nq2), wkgu(-1:nq2), xkgu(-1:nq2)
+integer, parameter:: ik0 = 100, iprint = 1, ndebug = 2
+integer i, j, j1, k, n, nwp
+real (mprknd), parameter:: dpi = 3.141592653589793238d0
+type (mp_real) eps, pi2, r, t1, t2, t3, t4, t5, zero
 
 if (ndebug >= 1) then
   write (6, 1)
@@ -589,11 +589,11 @@ stop
 130 continue
 
 return
-end
+end subroutine initqgs
 
-function quadgs (fun, x1, x2, nq1, nq2, nwds1, nwds2, neps1, wkgs, xkgs)
+type (mp_real) function quadgs (fun, x1, x2, nq1, nq2, nwds1, nwds2, neps1, wkgs, xkgs)
 
-!   David H Bailey  16 Jul 2021
+!   David H Bailey   7 Jan 2023
 
 !   This routine computes the integral of the function fun on the interval
 !   (x1, x2) with a target tolerance of 10^neps1. The quadrature level is
@@ -637,14 +637,16 @@ function quadgs (fun, x1, x2, nq1, nq2, nwds1, nwds2, neps1, wkgs, xkgs)
 
 use mpmodule
 implicit none
-integer i, k, j, n, ndebug, nq1, nq2, &
-  neps1, nwds1, nwds2
-double precision d1, d2, d3, dfrac, dplog10
-parameter (dfrac = 100.d0, ndebug = 2)
-type (mp_real) ax, bx, c10, eps1, epsilon1, err, fun, &
-  quadgs, tsum, s1, s2, s3, t1, t2, tw1, tw2, twmx, wkgs(-1:nq2), xkgs(-1:nq2), &
-  x1, x2, xx1, xx2
-external fun, dplog10
+type (mp_real), external:: fun
+integer, intent(in):: nq1, nq2, nwds1, nwds2, neps1
+type (mp_real), intent(in):: wkgs(-1:nq2), xkgs(-1:nq2)
+integer, parameter:: ndebug = 2
+real (mprknd), parameter:: dfrac = 100.d0
+real (mprknd), external:: dplog10
+integer i, k, j, n
+real (mprknd) d1, d2, d3
+type (mp_real) ax, bx, c10, eps1, epsilon1, err, &
+  tsum, s1, s2, s3, t1, t2, tw1, tw2, twmx, x1, x2, xx1, xx2
 
 !  These two lines are performed in high precision (nwds2 words).
 
@@ -707,7 +709,7 @@ do k = 1, nq1
 
   if (k <= 2) then
     err = mpreal (1.d0, nwds1)
-  elseif (d1 .eq. -999999.d0) then
+  elseif (d1 == -999999.d0) then
     err = mpreal (0.d0, nwds1)
   else
     err = c10 ** nint (min (0.d0, max (d1 ** 2 / d2, 2.d0 * d1, d3)))
@@ -733,17 +735,17 @@ enddo
 
 quadgs = s1
 return
-end
+end function quadgs
 
-function dplog10 (a)
+real (mprknd) function dplog10 (a)
 
 !   For input MPM value a, this routine returns a DP approximation to log10 (a).
 
 use mpmodule
 implicit none
+type (mp_real), intent(in):: a
 integer ia
-real (mprknd) da, dplog10
-type (mp_real) a
+real (mprknd) da
 
 call mpdecmd (a, da, ia)
 if (da == 0.d0) then
@@ -754,4 +756,4 @@ endif
 
 100 continue
 return
-end
+end function dplog10

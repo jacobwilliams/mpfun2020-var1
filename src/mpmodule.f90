@@ -1,9 +1,9 @@
 !*****************************************************************************
 
-!  MPFUN20: A thread-safe Fortran arbitrary precision computation package
+!  MPFUN20-Fort: A thread-safe arbitrary precision package with special functions
 !  Main module (module MPMODULE) -- references all other modules for user.
 
-!  Revision date:  27 Dec 2021
+!  Revision date:  16 Mar 2023
 
 !  AUTHOR:
 !     David H. Bailey
@@ -11,7 +11,7 @@
 !     Email: dhbailey@lbl.gov
 
 !  COPYRIGHT AND DISCLAIMER:
-!    All software in this package (c) 2021 David H. Bailey.
+!    All software in this package (c) 2022 David H. Bailey.
 !    By downloading or using this software you agree to the copyright, disclaimer
 !    and license agreement in the accompanying file DISCLAIMER.txt.
 
@@ -19,7 +19,7 @@
 !    This package permits one to perform floating-point computations (real and
 !    complex) to arbitrarily high numeric precision, by making only relatively
 !    minor changes to existing Fortran-90 programs.  All basic arithmetic
-!    operations and transcendental functions are supported, together with several
+!    operations and transcendental functions are supported, together with numerous
 !    special functions.
 
 !    In addition to fast execution times, one key feature of this package is a
@@ -32,15 +32,15 @@
 !    and testing this program on various specific systems are included in the
 !    README file accompanying this package, and, in more detail, in the
 !    following technical paper:
-
-!    David H. Bailey, "MPFUN2020: A new thread-safe arbitrary precision package,"
+   
+!    David H. Bailey, "MPFUN2020: A new thread-safe arbitrary precision package," 
 !    available at http://www.davidhbailey.com/dhbpapers/mpfun2020.pdf.
 
 !  DESCRIPTION OF THIS MODULE (MPMODULE):
 !    This module links all lower-level modules and is the connection between
 !    user codes and the lower modules. It also declares as private routines in
 !    lower-level modules that are not intended to be called directly by the user.
-!    See documentation for details.
+!    See documentation for details. 
 
 module mpmodule
 
@@ -56,11 +56,11 @@ use mpfunh
 !   Private subroutine names in module MPFUNB:
 
 private &
-  mpadd, mpcabs, mpcadd, mpcdiv, mpceq, mpcmul, mpcnpwr, mpconjg, mpcsqrt, &
-  mpcsub, mpcpr, mpdiv, mpdivd, mpdivd40, mpdmc, mpdmc40, mpeq, mpinfr, mpmdc, &
-  mpmul, mpmuld, mpmuld40, mpnint, mpnorm, mpnpwr, mpnrtr, mprandr, mproun, &
-  mpsqrt, mpsub, mpmqc,  mpqmc, mpqmc90, mpfftcr, mpfftrc, mpfft1, mpfft2, &
-  mpfft3, mpinifft, mplconv, mpmulx
+  mpabs, mpadd, mpcabs, mpcadd, mpcdiv, mpceq, mpcmul, mpcnpwr, mpconjg, &
+  mpcsqrt, mpcsub, mpcpr, mpdiv, mpdivd, mpdivd40, mpdmc, mpdmc40, mpeq, &
+  mpinfr, mpmdc, mpmul, mpmuld, mpmuld40, mpneg, mpnint, mpnorm, mpnpwr, &
+  mpnrtr, mprandr, mproun, mpsgn, mpsqrt, mpsub, mpmqc,  mpqmc, mpqmc90, &
+  mpfftcr, mpfftrc, mpfft1, mpfft2, mpfft3, mpinifft, mplconv, mpmulx
 
 !   Private subroutine names in module MPFUNC:
 
@@ -76,10 +76,12 @@ private &
 !   Private subroutine names in module MPFUNE:
 
 private &
-  mpinitwds, mpabs, mpneg, mpsigntr, mpwprecr, mpspacer, mpberner, mppolyadd, &
-  mppolysub, mpbesselinr, mpbesseljnr, mpbesselknr, mpbesselynr, &
-  mperfr, mperfcr, mpgammar, mpincgammar, mppolylogini, mppolylogneg, &
-  mppolylogpos, mpzetar, mpzetaemr, mpzetaintr
+  mpinitwds, mpwprecr, mpspacer, mpberner, mppolyadd, mppolysub, mppolymul, &
+  mpbesselinr, mpbesselir, mpbesseljnr, mpbesseljr, mpbesselknr, mpbesselkr, &
+  mpbesselynr, mpbesselyr, mpdigammabe, mperfr, mperfcr, mpexpint, mpgammar, &
+  mphurwitzzetan, mphurwitzzetanbe, mphypergeompfq, mpincgammar, mppolygamma, &
+  mppolygammabe, mppolylogini, mppolylogneg, mppolylogpos, mpstruvehn, mpzetar, &
+  mpzetaintr, mpzetabe
 
 end module mpmodule
 

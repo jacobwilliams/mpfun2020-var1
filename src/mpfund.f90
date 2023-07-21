@@ -1,9 +1,9 @@
 !*****************************************************************************
 
-!  MPFUN20-Fort: A thread-safe arbitrary precision computation package
+!  MPFUN20-Fort: A thread-safe arbitrary precision package with special functions
 !  Transcendental function module (module MPFUND)
 
-!  Revision date:  26 Dec 2021
+!  Revision date:  25 Mar 2023
 
 !  AUTHOR:
 !    David H. Bailey
@@ -11,15 +11,15 @@
 !    Email: dhbailey@lbl.gov
 
 !  COPYRIGHT AND DISCLAIMER:
-!    All software in this package (c) 2021 David H. Bailey.
+!    All software in this package (c) 2023 David H. Bailey.
 !    By downloading or using this software you agree to the copyright, disclaimer
 !    and license agreement in the accompanying file DISCLAIMER.txt.
 
 !  PURPOSE OF PACKAGE:
 !    This package permits one to perform floating-point computations (real and
 !    complex) to arbitrarily high numeric precision, by making only relatively
-!    minor changes to existing Fortran-90 programs.  All basic arithmetic
-!    operations and transcendental functions are supported, together with several
+!    minor changes to existing Fortran-90 programs. All basic arithmetic
+!    operations and transcendental functions are supported, together with numerous
 !    special functions.
 
 !    In addition to fast execution times, one key feature of this package is a
@@ -32,10 +32,10 @@
 !    and testing this program on various specific systems are included in the
 !    README file accompanying this package, and, in more detail, in the
 !    following technical paper:
-   
-!    David H. Bailey, "MPFUN2020: A new thread-safe arbitrary precision package," 
-!    available at http://www.davidhbailey.com/dhbpapers/mpfun2020.pdf. 
- 
+
+!    David H. Bailey, "MPFUN2020: A new thread-safe arbitrary precision package,"
+!    available at http://www.davidhbailey.com/dhbpapers/mpfun2020.pdf.
+
 !  DESCRIPTION OF THIS MODULE (MPFUND):
 !    This module contains subroutines for basic transcendental functions,
 !    including routines for cos, sin, inverse cos/sin, hyperbolic cos/sin,
@@ -50,7 +50,7 @@ contains
 
 subroutine mpagmr (a, b, c, mpnw)
 
-!   This performs the arithmetic-geometric mean (AGM) iterations on A and B.  
+!   This performs the arithmetic-geometric mean (AGM) iterations on A and B.
 !   The AGM algorithm is as follows: Set a_0 = a and b_0 = b, then iterate
 
 !    a_{k+1} = (a_k + b_k)/2
@@ -61,17 +61,24 @@ subroutine mpagmr (a, b, c, mpnw)
 
 implicit none
 integer, intent(in):: mpnw
-integer itrmx, j, mpnw1
-parameter (itrmx = 100)
 integer (mpiknd), intent(in):: a(0:), b(0:)
 integer (mpiknd), intent(out):: c(0:)
+integer, parameter:: itrmx = 100
+integer j, mpnw1
 integer (mpiknd) s0(0:mpnw+6), s1(0:mpnw+6), s2(0:mpnw+6), s3(0:mpnw+6)
 
-if (mpnw < 4 .or. a(0) < mpnw + 4 .or. b(0) < abs (a(2)) + 4 .or. &
-  c(0) < mpnw + 6) then
+!  End of declaration.
+
+if (mpnw < 4 .or. c(0) < mpnw + 6) then
   write (mpldb, 1)
 1 format ('*** MPAGMR: uninitialized or inadequately sized arrays')
-  call mpabrt (99)
+  call mpabrt ( 401)
+endif
+
+if (mpsgn (a) <= 0 .or. mpsgn (b) <= 0) then
+  write (mpldb, 2)
+2 format ('*** MPAGMR: argument <= 0')
+  call mpabrt ( 402)
 endif
 
 s0(0) = mpnw + 7
@@ -87,7 +94,7 @@ do j = 1, itrmx
   call mpmuld (s0, 0.5d0, s3, mpnw1)
   call mpmul (s1, s2, s0, mpnw1)
   call mpsqrt (s0, s2, mpnw1)
-  call mpeq (s3, s1, mpnw1)
+ call mpeq (s3, s1, mpnw1)
 
 !   Check for convergence.
 
@@ -95,9 +102,9 @@ do j = 1, itrmx
   if (s0(2) == 0 .or. s0(3) < 1 - mpnw1) goto 100
 enddo
 
-write (mpldb, 2)
-2 format ('*** MPAGMR: Iteration limit exceeded.')
-call mpabrt (5)
+write (mpldb, 3)
+3 format ('*** MPAGMR: Iteration limit exceeded.')
+call mpabrt ( 402)
 
 100 continue
 
@@ -110,9 +117,9 @@ end subroutine mpagmr
 subroutine mpang (x, y, a, mpnw)
 
 !   This computes the MPR angle A subtended by the MPR pair (X, Y) considered as
-!   a point in the x-y plane.  This is more useful than an arctan or arcsin
+!   a point in the x-y plane. This is more useful than an arctan or arcsin
 !   routine, since it places the result correctly in the full circle, i.e.
-!   -Pi < A <= Pi.  Pi must be precomputed to at least MPNW words precision
+!   -Pi < A <= Pi. Pi must be precomputed to at least MPNW words precision
 !   and the stored in the array in module MPFUNA.
 
 !   The Taylor series for Arcsin converges much more slowly than that of Sin,
@@ -128,21 +135,21 @@ subroutine mpang (x, y, a, mpnw)
 
 implicit none
 integer, intent(in):: mpnw
-integer iq, ix, iy, k, kk, mpnw1, mq, nit, nx, ny, n1, n2
-real (mprknd) cl2, cpi, d1, t1, t2, t3
-parameter (cl2 = 1.4426950408889633d0, cpi = 3.1415926535897932d0, nit = 3)
 integer (mpiknd), intent(in):: x(0:), y(0:)
 integer (mpiknd), intent(out):: a(0:)
+integer, parameter:: nit = 3
+real (mprknd), parameter:: cl2 = 1.4426950408889633d0, cpi = 3.1415926535897932d0
+integer iq, ix, iy, k, kk, mpnw1, mq, nx, ny, n1, n2
+real (mprknd) d1, t1, t2, t3
 integer (mpiknd) s0(0:mpnw+6), s1(0:mpnw+6), s2(0:mpnw+6), s3(0:mpnw+6), &
   s4(0:mpnw+6), s5(0:mpnw+6)
 
 ! End of declaration
 
-if (mpnw < 4 .or. x(0) < mpnw + 4 .or. x(0) < abs (x(2)) + 4 .or. &
-  y(0) < mpnw + 4 .or. y(0) < abs (y(2)) + 4 .or. a(0) < mpnw + 6) then
+if (mpnw < 4 .or. a(0) < mpnw + 6) then
   write (mpldb, 1)
 1 format ('*** MPANG: uninitialized or inadequately sized arrays')
-  call mpabrt (99)
+  call mpabrt ( 403)
 endif
 
 ix = sign (int (1, mpiknd), x(2))
@@ -162,7 +169,7 @@ s5(0) = mpnw + 7
 if (nx == 0 .and. ny == 0) then
   write (mpldb, 2)
 2 format ('*** MPANG: Both arguments are zero.')
-  call mpabrt (7)
+  call mpabrt ( 404)
 endif
 
 !   Check if Pi has been precomputed.
@@ -173,45 +180,45 @@ if (abs (d1 - cpi) > mprdfz .or. mpnw1 > mppicon(1)) then
   write (mpldb, 3) mpnw1
 3 format ('*** MPANG: Pi must be precomputed to precision',i9,' words.'/ &
   'See documentation for details.')
-  call mpabrt (8)
+  call mpabrt ( 405)
 endif
 
 !   Check if one of X or Y is zero.
 
 if (nx == 0) then
   call mpeq (mppicon, s0, mpnw1)
-  if (iy .gt. 0) then
-    call mpmuld (s0, 0.5d0, a, mpnw) 
+  if (iy > 0) then
+    call mpmuld (s0, 0.5d0, a, mpnw)
   else
-    call mpmuld (s0, -0.5d0, a, mpnw) 
+    call mpmuld (s0, -0.5d0, a, mpnw)
   endif
   goto 120
 elseif (ny == 0) then
-  if (ix .gt. 0) then
+  if (ix > 0) then
     a(1) = mpnw
     a(2) = 0
     a(3) = 0
     a(4) = 0
     a(5) = 0
   else
-    call mpeq (s0, a, mpnw) 
+    call mpeq (s0, a, mpnw)
   endif
   goto 120
 endif
 
-!   Determine the least integer MQ such that 2 ^ MQ .GE. MPNW.
+!   Determine the least integer MQ such that 2 ^ MQ >= MPNW.
 
 t1 = mpnw1
 mq = cl2 * log (t1) + 2.d0 - mprdfz
 
 !   Normalize x and y so that x^2 + y^2 = 1.
 
-call mpmul (x, x, s0, mpnw1) 
-call mpmul (y, y, s1, mpnw1) 
-call mpadd (s0, s1, s2, mpnw1) 
-call mpsqrt (s2, s3, mpnw1) 
-call mpdiv (x, s3, s1, mpnw1) 
-call mpdiv (y, s3, s2, mpnw1) 
+call mpmul (x, x, s0, mpnw1)
+call mpmul (y, y, s1, mpnw1)
+call mpadd (s0, s1, s2, mpnw1)
+call mpsqrt (s2, s3, mpnw1)
+call mpdiv (x, s3, s1, mpnw1)
+call mpdiv (y, s3, s2, mpnw1)
 
 !   Compute initial approximation of the angle.
 
@@ -228,12 +235,12 @@ call mpdmc (t3, 0, s5, mpnw1)
 !   This selects the Newton iteration (of the two listed above) that has the
 !   largest denominator.
 
-if (abs (t1) .le. abs (t2)) then
+if (abs (t1) <= abs (t2)) then
   kk = 1
-  call mpeq (s1, s0, mpnw1) 
+  call mpeq (s1, s0, mpnw1)
 else
   kk = 2
-  call mpeq (s2, s0, mpnw1) 
+  call mpeq (s2, s0, mpnw1)
 endif
 
 mpnw1 = 4
@@ -247,19 +254,19 @@ do k = 1, mq
 
 100  continue
 
-  call mpcssnr (s5, s1, s2, mpnw1) 
+  call mpcssnr (s5, s1, s2, mpnw1)
 
   if (kk == 1) then
-    call mpsub (s0, s1, s3, mpnw1) 
-    call mpdiv (s3, s2, s4, mpnw1) 
-    call mpsub (s5, s4, s1, mpnw1) 
+    call mpsub (s0, s1, s3, mpnw1)
+    call mpdiv (s3, s2, s4, mpnw1)
+    call mpsub (s5, s4, s1, mpnw1)
   else
-    call mpsub (s0, s2, s3, mpnw1) 
-    call mpdiv (s3, s1, s4, mpnw1) 
-    call mpadd (s5, s4, s1, mpnw1) 
+    call mpsub (s0, s2, s3, mpnw1)
+    call mpdiv (s3, s1, s4, mpnw1)
+    call mpadd (s5, s4, s1, mpnw1)
   endif
-  call mpeq (s1, s5, mpnw1) 
-  
+  call mpeq (s1, s5, mpnw1)
+
   if (k == mq - nit .and. iq == 0) then
     iq = 1
     goto 100
@@ -290,22 +297,22 @@ subroutine mpcagm (a, b, c, mpnw)
 
 implicit none
 integer, intent(in):: mpnw
-integer itrmx, j, la, lb, lc, mp7, mpnw1
-parameter (itrmx = 100)
 integer (mpiknd), intent(in):: a(0:), b(0:)
 integer (mpiknd), intent(out):: c(0:)
+integer, parameter:: itrmx = 100
+integer j, la, lb, lc, mp7, mpnw1
 integer (mpiknd) s0(0:2*mpnw+13), s1(0:2*mpnw+13), s2(0:2*mpnw+13), &
   s3(0:2*mpnw+13)
+
+!  End of declaration.
 
 la = a(0)
 lb = b(0)
 lc = c(0)
-if (mpnw < 4 .or. a(0) < abs (a(2)) + 4 .or. a(la) < abs (a(la+2)) + 4 &
-  .or. b(0) < abs (b(2)) + 4 .or. b(lb) < abs (b(lb+2)) + 4 .or. &
-  c(0) < mpnw + 6 .or. c(lc) < mpnw + 6) then
+if (mpnw < 4 .or.  c(0) < mpnw + 6 .or. c(lc) < mpnw + 6) then
   write (mpldb, 1)
 1 format ('*** MPCAGM: uninitialized or inadequately sized arrays')
-  call mpabrt (99)
+  call mpabrt ( 406)
 endif
 
 mp7 = mpnw + 7
@@ -324,8 +331,8 @@ call mpceq (b, s2, mpnw1)
 do j = 1, itrmx
   call mpcadd (s1, s2, s0, mpnw1)
   call mpmuld (s0, 0.5d0, s3, mpnw1)
-  call mpmuld (s0(mp7:), 0.5d0, s3(mp7:), mpnw1) 
-  call mpcmul (s1, s2, s0, mpnw1) 
+  call mpmuld (s0(mp7:), 0.5d0, s3(mp7:), mpnw1)
+  call mpcmul (s1, s2, s0, mpnw1)
   call mpcsqrt (s0, s2, mpnw1)
   call mpceq (s3, s1, mpnw1)
   call mpcsub (s1, s2, s0, mpnw1)
@@ -338,7 +345,7 @@ enddo
 
 write (mpldb, 2)
 2 format ('*** MPCAGM: Iteration limit exceeded.')
-call mpabrt (5)
+call mpabrt ( 407)
 
 100 continue
 
@@ -358,9 +365,9 @@ subroutine mpcexp (a, b, mpnw)
 
 implicit none
 integer, intent(in):: mpnw
-integer la, lb, mpnw1
 integer (mpiknd), intent(in):: a(0:)
 integer (mpiknd), intent(out):: b(0:)
+integer la, lb, mpnw1
 integer (mpiknd) s0(0:mpnw+6), s1(0:mpnw+6), s2(0:mpnw+6), s3(0:mpnw+6), &
   s4(0:mpnw+6)
 
@@ -368,14 +375,13 @@ integer (mpiknd) s0(0:mpnw+6), s1(0:mpnw+6), s2(0:mpnw+6), s3(0:mpnw+6), &
 
 la = a(0)
 lb = b(0)
-if (mpnw < 4 .or. a(0) < abs (a(2)) + 4 .or. a(la) < abs (a(la+2)) + 4 &
-  .or. b(0) < mpnw + 6 .or. b(lb) < mpnw + 6) then
+if (mpnw < 4 .or. b(0) < mpnw + 6 .or. b(lb) < mpnw + 6) then
   write (mpldb, 1)
 1 format ('*** MPCEXP: uninitialized or inadequately sized arrays')
-  call mpabrt (99)
+  call mpabrt ( 408)
 endif
 
-mpnw1 = mpnw + 1 
+mpnw1 = mpnw + 1
 s0(0) = mpnw + 7
 s1(0) = mpnw + 7
 s2(0) = mpnw + 7
@@ -407,23 +413,22 @@ subroutine mpclog (a, b, mpnw)
 
 implicit none
 integer, intent(in):: mpnw
-integer la, lb, mpnw1
 integer (mpiknd), intent(in):: a(0:)
 integer (mpiknd), intent(out):: b(0:)
+integer la, lb, mpnw1
 integer (mpiknd) s0(0:mpnw+6), s1(0:mpnw+6), s2(0:mpnw+6), s3(0:mpnw+6)
 
 ! End of declaration
 
 la = a(0)
 lb = b(0)
-if (mpnw < 4 .or. a(0) < abs (a(2)) + 4 .or. a(la) < abs (a(la+2)) + 4 &
-  .or. b(0) < mpnw + 6 .or. b(lb) < mpnw + 6) then
+if (mpnw < 4 .or. b(0) < mpnw + 6 .or. b(lb) < mpnw + 6) then
   write (mpldb, 1)
 1 format ('*** MPCLOG: uninitialized or inadequately sized arrays')
-  call mpabrt (99)
+  call mpabrt ( 409)
 endif
 
-mpnw1 = mpnw + 1 
+mpnw1 = mpnw + 1
 s0(0) = mpnw + 7
 s1(0) = mpnw + 7
 s2(0) = mpnw + 7
@@ -452,9 +457,9 @@ subroutine mpcpowcc (a, b, c, mpnw)
 
 implicit none
 integer, intent(in):: mpnw
-integer la, lb, lc, l3
 integer (mpiknd), intent(in):: a(0:), b(0:)
 integer (mpiknd), intent(out):: c(0:)
+integer la, lb, lc, l3
 integer (mpiknd) s1(0:2*mpnw+11), s2(0:2*mpnw+11)
 
 ! End of declaration
@@ -462,12 +467,10 @@ integer (mpiknd) s1(0:2*mpnw+11), s2(0:2*mpnw+11)
 la = a(0)
 lb = b(0)
 lc = c(0)
-if (mpnw < 4 .or. a(0) < abs (a(2)) + 4 .or. a(la) < abs (a(la+2)) + 4 &
-  .or. b(0) < abs (b(2)) + 4 .or. b(lb) < abs (b(lb+2)) + 4 &
-  .or. c(0) < mpnw + 6 .or. c(lc) < mpnw + 6) then
+if (mpnw < 4 .or. c(0) < mpnw + 6 .or. c(lc) < mpnw + 6) then
   write (mpldb, 1)
 1 format ('*** MPCPOWCC: uninitialized or inadequately sized arrays')
-  call mpabrt (99)
+  call mpabrt ( 410)
 endif
 
 l3 = mpnw + 6
@@ -488,21 +491,19 @@ subroutine mpcpowcr (a, b, c, mpnw)
 
 implicit none
 integer, intent(in):: mpnw
-integer la, lc, l3
 integer (mpiknd), intent(in):: a(0:), b(0:)
-integer (mpiknd), intent(out):: c(0:) 
+integer (mpiknd), intent(out):: c(0:)
+integer la, lc, l3
 integer (mpiknd) s1(0:2*mpnw+11), s2(0:2*mpnw+11)
 
 ! End of declaration
 
 la = a(0)
 lc = c(0)
-if (mpnw < 4 .or. a(0) < abs (a(2)) + 4 .or. a(la) < abs (a(la+2)) + 4 &
-  .or. b(0) < abs (b(2)) + 4 &
-  .or. c(0) < mpnw + 6 .or. c(lc) < mpnw + 6) then
+if (mpnw < 4 .or. c(0) < mpnw + 6 .or. c(lc) < mpnw + 6) then
   write (mpldb, 1)
 1 format ('*** MPCPOWCR: uninitialized or inadequately sized arrays')
-  call mpabrt (99)
+  call mpabrt ( 411)
 endif
 
 l3 = mpnw + 6
@@ -524,21 +525,19 @@ subroutine mpcpowrc (a, b, c, mpnw)
 
 implicit none
 integer, intent(in):: mpnw
-integer lb, lc, l3
 integer (mpiknd), intent(in):: a(0:), b(0:)
 integer (mpiknd), intent(out):: c(0:)
+integer lb, lc, l3
 integer (mpiknd) s1(0:2*mpnw+11), s2(0:2*mpnw+11)
 
 ! End of declaration
 
 lb = b(0)
 lc = c(0)
-if (mpnw < 4 .or. a(0) < abs (a(2)) + 4 &
-  .or. b(0) < abs (b(2)) + 4 .or. b(lb) < abs (b(lb+2)) + 4 &
-  .or. c(0) < mpnw + 6 .or. c(lc) < mpnw + 6) then
+if (mpnw < 4 .or. c(0) < mpnw + 6 .or. c(lc) < mpnw + 6) then
   write (mpldb, 1)
 1 format ('*** MPCPOWRC: uninitialized or inadequately sized arrays')
-  call mpabrt (99)
+  call mpabrt ( 412)
 endif
 
 l3 = mpnw + 6
@@ -556,26 +555,25 @@ end subroutine mpcpowrc
 subroutine mpcsshr (a, x, y, mpnw)
 
 !   This computes the hyperbolic cosine and sine of the MPR number A and
-!   returns the two MPR results in X and Y, respectively.  If the argument
+!   returns the two MPR results in X and Y, respectively. If the argument
 !   is very close to zero, a Taylor series is used; otherwise this routine
 !   calls mpexp.
 
 implicit none
 integer, intent(in):: mpnw
-integer itrmx, j, mpnw1, mpnw2
-parameter (itrmx = 1000000)
-real (mprknd) t2
 integer (mpiknd), intent(in):: a(0:)
 integer (mpiknd), intent(out):: x(0:), y(0:)
+integer, parameter:: itrmx = 1000000
+integer j, mpnw1, mpnw2
+real (mprknd) t2
 integer (mpiknd) f(0:9), s0(0:mpnw+6), s1(0:mpnw+6), s2(0:mpnw+6), s3(0:mpnw+6)
 
 ! End of declaration
 
-if (mpnw < 4 .or. a(0) < mpnw + 4 .or. a(0) < abs (a(2)) + 4 .or. &
-  x(0) < mpnw + 6 .or. y(0) < mpnw + 6) then
+if (mpnw < 4 .or. x(0) < mpnw + 6 .or. y(0) < mpnw + 6) then
   write (mpldb, 1)
 1 format ('*** MPCSSHR: uninitialized or inadequately sized arrays')
-  call mpabrt (99)
+  call mpabrt ( 413)
 endif
 
 s0(0) = mpnw + 7
@@ -595,8 +593,8 @@ f(6) = 0
 !   This avoids accuracy loss that otherwise occurs by using exp.
 
 if (a(3) < -1) then
-  call mpeq (a, s0, mpnw1) 
-  call mpmul (s0, s0, s2, mpnw1) 
+  call mpeq (a, s0, mpnw1)
+  call mpmul (s0, s0, s2, mpnw1)
   mpnw2 =  mpnw1
 
 !   The working precision used to compute each term can be linearly reduced
@@ -605,8 +603,8 @@ if (a(3) < -1) then
   do j = 1, itrmx
     t2 = (2.d0 * j) * (2.d0 * j + 1.d0)
     call mpmul (s2, s1, s3, mpnw2)
-    call mpdivd (s3, t2, s1, mpnw2) 
-    call mpadd (s1, s0, s3, mpnw1) 
+    call mpdivd (s3, t2, s1, mpnw2)
+    call mpadd (s1, s0, s3, mpnw1)
     call mpeq (s3, s0, mpnw1)
 
 !   Check for convergence of the series, and adjust working precision
@@ -618,7 +616,7 @@ if (a(3) < -1) then
 
   write (mpldb, 4)
 4 format ('*** MPCSSHR: Iteration limit exceeded.')
-  call mpabrt (29)
+  call mpabrt ( 414)
 
 110 continue
 
@@ -631,13 +629,13 @@ if (a(3) < -1) then
   call mpeq (s0, y, mpnw)
 else
   call mpexp (a, s0, mpnw1)
-  call mpdiv (f, s0, s1, mpnw1) 
+  call mpdiv (f, s0, s1, mpnw1)
   call mpadd (s0, s1, s2, mpnw1)
   call mpmuld (s2, 0.5d0, s3, mpnw1)
   call mproun (s3, mpnw)
-  call mpeq (s3, x, mpnw) 
-  call mpsub (s0, s1, s2, mpnw1) 
-  call mpmuld (s2, 0.5d0, s3, mpnw1) 
+  call mpeq (s3, x, mpnw)
+  call mpsub (s0, s1, s2, mpnw1)
+  call mpmuld (s2, 0.5d0, s3, mpnw1)
   call mproun (s3, mpnw)
   call mpeq (s3, y, mpnw)
 endif
@@ -650,7 +648,7 @@ end subroutine mpcsshr
 subroutine mpcssnr (a, x, y, mpnw)
 
 !   This computes the cosine and sine of the MPR number A and returns the
-!   two MPR results in X and Y, respectively.  Pi must be precomputed to
+!   two MPR results in X and Y, respectively. Pi must be precomputed to
 !   at least MPNW words precision and the stored in the array MPPICON in
 !   module MPFUNA.
 
@@ -658,7 +656,7 @@ subroutine mpcssnr (a, x, y, mpnw)
 
 !   Sin (s) =  s - s^3 / 3! + s^5 / 5! - s^7 / 7! ...
 
-!   where the argument S has been reduced to (-pi, pi).  To further
+!   where the argument S has been reduced to (-pi, pi). To further
 !   accelerate the series, the reduced argument is divided by 2^NQ, where NQ
 !   is computed as int (sqrt (0.5d0 * N)), where N is the precision in bits.
 !   After convergence of the series, the double-angle formulas for cos are
@@ -666,22 +664,21 @@ subroutine mpcssnr (a, x, y, mpnw)
 
 implicit none
 integer, intent(in):: mpnw
-integer is, itrmx, i1, j, mpnw1, mpnw2, na, nq, n1
-parameter (itrmx = 1000000)
-real (mprknd) cpi, d1, t1, t2
-parameter (cpi = 3.1415926535897932d0)
+real (mprknd) d1, t1, t2
 integer (mpiknd), intent(in):: a(0:)
 integer (mpiknd), intent(out):: x(0:), y(0:)
+integer, parameter:: itrmx = 1000000
+real (mprknd), parameter:: cpi = 3.1415926535897932d0
+integer is, i1, j, mpnw1, mpnw2, na, nq, n1
 integer (mpiknd) f1(0:8), f2(0:8),s0(0:mpnw+6), s1(0:mpnw+6), s2(0:mpnw+6), &
   s3(0:mpnw+6), s4(0:mpnw+6), s5(0:mpnw+6)
-  
+
 ! End of declaration
 
-if (mpnw < 4 .or. a(0) < mpnw + 4 .or. a(0) < abs (a(2)) + 4 .or. &
-  x(0) < mpnw + 6 .or. y(0) < mpnw + 6) then
+if (mpnw < 4 .or. x(0) < mpnw + 6 .or. y(0) < mpnw + 6) then
   write (mpldb, 1)
 1 format ('*** MPCSSNR: uninitialized or inadequately sized arrays')
-  call mpabrt (99)
+  call mpabrt ( 415)
 endif
 
 na = min (int (abs (a(2))), mpnw)
@@ -734,7 +731,7 @@ if (abs (d1 - cpi) > mprdfz .or. mpnw1 > mppicon(1)) then
   write (mpldb, 2) mpnw1
 2 format ('*** MPCSSNR: Pi must be precomputed to precision',i9,' words).'/ &
   'See documentation for details.')
-  call mpabrt (27)
+  call mpabrt ( 416)
 endif
 
 !   Check if argument is too large to compute meaningful cos/sin values.
@@ -743,7 +740,7 @@ call mpmdc (a, t1, n1, mpnw)
 if (n1 >= mpnbt * (mpnw - 1)) then
   write (mpldb, 3)
 3 format ('*** MPCSSNR: argument is too large to compute cos or sin.')
-  call mpabrt (28)
+  call mpabrt ( 417)
 endif
 
 !   Reduce to between - Pi and Pi.
@@ -754,7 +751,7 @@ call mpnint (s1, s2, mpnw1)
 call mpmul (s0, s2, s4, mpnw1)
 call mpsub (a, s4, s3, mpnw1)
 
-!   Check if reduced argument is zero.  If so then cos = 1 and sin = 0.
+!   Check if reduced argument is zero. If so then cos = 1 and sin = 0.
 
 if (s3(2) == 0) then
   s0(1) = mpnw1
@@ -785,7 +782,7 @@ call mpeq (s0, s1, mpnw1)
 
 !   Compute the sin of the reduced argument of s1 using a Taylor series.
 
-call mpmul (s0, s0, s2, mpnw1) 
+call mpmul (s0, s0, s2, mpnw1)
 mpnw2 =  mpnw1
 is = s0(2)
 
@@ -795,8 +792,8 @@ is = s0(2)
 do i1 = 1, itrmx
   t2 = - (2.d0 * i1) * (2.d0 * i1 + 1.d0)
   call mpmul (s2, s1, s3, mpnw2)
-  call mpdivd (s3, t2, s1, mpnw2) 
-  call mpadd (s1, s0, s3, mpnw1) 
+  call mpdivd (s3, t2, s1, mpnw2)
+  call mpadd (s1, s0, s3, mpnw1)
   call mpeq (s3, s0, mpnw1)
 
 !   Check for convergence of the series, and adjust working precision
@@ -808,7 +805,7 @@ enddo
 
 write (mpldb, 4)
 4 format ('*** MPCSSNR: Iteration limit exceeded.')
-call mpabrt (29)
+call mpabrt ( 418)
 
 110 continue
 
@@ -850,8 +847,8 @@ endif
 
 !   Restore original precision level.
 
-call mproun (s0, mpnw) 
-call mproun (s1, mpnw) 
+call mproun (s0, mpnw)
+call mproun (s1, mpnw)
 call mpeq (s0, x, mpnw)
 call mpeq (s1, y, mpnw)
 
@@ -876,17 +873,17 @@ subroutine mpegammaq (egamma, mpnw)
 
 implicit none
 integer, intent(in):: mpnw
-integer k, mpnw1, ndp, n1, n2
 integer (mpiknd), intent(out):: egamma(0:)
+integer k, mpnw1, ndp, n1, n2
 integer (mpiknd) aa(0:mpnw+6), bb(0:mpnw+6), uu(0:mpnw+6), vv(0:mpnw+6), &
   s0(0:mpnw+6), s1(0:mpnw+6)
 
-! End of declaration.
+! End of declaration
 
 if (mpnw < 4 .or. egamma(0) < mpnw + 6) then
   write (mpldb, 1)
 1 format ('*** MPEGAMMAQ: uninitialized or inadequately sized arrays')
-  call mpabrt (99)
+  call mpabrt ( 419)
 endif
 
 mpnw1 = mpnw + 1
@@ -930,7 +927,7 @@ do k = 1, n2
 
   call mpmuld (bb, dble (n1)**2, s0, mpnw1)
   call mpdivd (s0, dble (k)**2, bb, mpnw1)
-  
+
 !  aa = (aa * dble (n1)**2 / dble (k) + bb) / dble (k)
 
   call mpmuld (aa, dble (n1)**2, s0, mpnw1)
@@ -945,7 +942,7 @@ do k = 1, n2
   call mpeq (s0, uu, mpnw1)
   call mpadd (vv, bb, s0, mpnw1)
   call mpeq (s0, vv, mpnw1)
-  
+
 !  if (aa%mpr(3) < uu%mpr(3) - nwds .and. bb%mpr(3) < vv%mpr(3) - nwds) &
 !    goto 100
 
@@ -960,7 +957,7 @@ call mpdiv (uu, vv, s0, mpnw1)
 
 !   Restore original precision level.
 
-call mproun (s0, mpnw) 
+call mproun (s0, mpnw)
 call mpeq (s0, egamma, mpnw)
 
 110 continue
@@ -971,7 +968,7 @@ end subroutine mpegammaq
 subroutine mpexp (a, b, mpnw)
 
 !   This computes the exponential function of the MPR number A and returns
-!   the MPR result in B.  Log(2) must be precomputed to at least MPNW words
+!   the MPR result in B. Log(2) must be precomputed to at least MPNW words
 !   precision and the stored in the array MPLOG2CON in module MPFUNA.
 
 !   This routine uses a modification of the Taylor series for Exp (t):
@@ -980,25 +977,25 @@ subroutine mpexp (a, b, mpnw)
 
 !   where the argument T has been reduced to within the closest factor of Log(2).
 !   To further accelerate the series, the reduced argument is divided by 2^NQ.
-!   After convergence of the series, the result is squared NQ times.  NQ is
+!   After convergence of the series, the result is squared NQ times. NQ is
 !   set to bb^0.4, where bb is the number of bits of precision.
 
 implicit none
 integer, intent(in):: mpnw
-integer itrmx, j, mpnw1, mpnw2, nq, nz, n1
-real (mprknd) cl2, d1, t1, t2
-parameter (itrmx = 1000000, cl2 = 0.69314718055994530d0)
 integer (mpiknd), intent(in):: a(0:)
 integer (mpiknd), intent(out):: b(0:)
+integer, parameter:: itrmx = 1000000
+real (mprknd), parameter:: cl2 = 0.69314718055994530d0
+integer j, mpnw1, mpnw2, nq, nz, n1
+real (mprknd) d1, t1, t2
 integer (mpiknd) f(0:8), s0(0:mpnw+6), s1(0:mpnw+6), s2(0:mpnw+6), s3(0:mpnw+6)
-   
+
 ! End of declaration
 
-if (mpnw < 4 .or. a(0) < mpnw + 4 .or. a(0) < abs (a(2)) + 4 .or. &
-  b(0) < mpnw + 6) then
+if (mpnw < 4 .or. b(0) < mpnw + 6) then
   write (mpldb, 1)
 1 format ('*** MPEXP: uninitialized or inadequately sized arrays')
-  call mpabrt (99)
+  call mpabrt ( 420)
 endif
 
 call mpmdc (a, t1, n1, mpnw)
@@ -1009,7 +1006,7 @@ if (n1 > 30) then
   if (t1 > 0.d0) then
     write (mpldb, 2)
 2   format ('*** MPEXP: Argument is too large.')
-    call mpabrt (34)
+    call mpabrt ( 421)
   else
     b(1) = mpnw
     b(2) = 0
@@ -1024,7 +1021,7 @@ t1 = t1 * 2.d0 ** n1
 if (abs (t1) > 1488522236.d0) then
   if (t1 > 0) then
     write (mpldb, 2)
-    call mpabrt (34)
+    call mpabrt ( 422)
   else
     b(1) = mpnw
     b(2) = 0
@@ -1059,18 +1056,18 @@ if (abs (d1 - cl2) > mprdfz .or. mpnw1 > mplog2con(1)) then
   write (mpldb, 3) mpnw1
 3 format ('*** MPEXP: Log(2) must be precomputed to precision',i9,' words.'/ &
   'See documentation for details.')
-  call mpabrt (35)
+  call mpabrt ( 423)
 endif
 
-!   Compute the reduced argument A' = A - Log(2) * Nint [A / Log(2)].  Save
+!   Compute the reduced argument A' = A - Log(2) * Nint [A / Log(2)]. Save
 !   NZ = Nint [A / Log(2)] for correcting the exponent of the final result.
 
 call mpdiv (a, mplog2con, s0, mpnw1)
-call mpnint (s0, s1, mpnw1) 
+call mpnint (s0, s1, mpnw1)
 call mpmdc (s1, t1, n1, mpnw1)
 nz = nint (t1 * 2.d0 ** n1)
-call mpmul (mplog2con, s1, s2, mpnw1) 
-call mpsub (a, s2, s0, mpnw1) 
+call mpmul (mplog2con, s1, s2, mpnw1)
+call mpsub (a, s2, s0, mpnw1)
 
 !   Check if the reduced argument is zero.
 
@@ -1091,20 +1088,20 @@ call mpdivd (s0, 2.d0**nq, s1, mpnw1)
 
 !   Compute Exp using the usual Taylor series.
 
-call mpeq (f, s2, mpnw1) 
+call mpeq (f, s2, mpnw1)
 call mpeq (f, s3, mpnw1)
 mpnw2 =  mpnw1
 
 !   The working precision used to compute each term can be linearly reduced
 !   as the computation proceeds.
 
-do j = 1, itrmx   
+do j = 1, itrmx
   t2 = dble (j)
-  call mpmul (s2, s1, s0, mpnw2)   
-  call mpdivd (s0, t2, s2, mpnw2) 
-  call mpadd (s3, s2, s0, mpnw1) 
-  call mpeq (s0, s3, mpnw1) 
-  
+  call mpmul (s2, s1, s0, mpnw2)
+  call mpdivd (s0, t2, s2, mpnw2)
+  call mpadd (s3, s2, s0, mpnw1)
+  call mpeq (s0, s3, mpnw1)
+
 !   Check for convergence of the series, and adjust working precision
 !   for the next term.
 
@@ -1114,15 +1111,15 @@ enddo
 
 write (mpldb, 4)
 4 format ('*** MPEXP: Iteration limit exceeded.')
-call mpabrt (36)
+call mpabrt ( 424)
 
 100 continue
 
 !   Raise to the (2 ^ NQ)-th power.
 
 do j = 1, nq
-  call mpmul (s0, s0, s1, mpnw1) 
-  call mpeq (s1, s0, mpnw1) 
+  call mpmul (s0, s0, s1, mpnw1)
+  call mpeq (s1, s0, mpnw1)
 enddo
 
 !   Multiply by 2 ^ NZ.
@@ -1134,7 +1131,7 @@ call mpmul (s0, s2, s1, mpnw1)
 
 !   Restore original precision level.
 
-call mproun (s1, mpnw) 
+call mproun (s1, mpnw)
 call mpeq (s1, b, mpnw)
 
 130 continue
@@ -1145,14 +1142,16 @@ end subroutine mpexp
 subroutine mpinitran (mpnw)
 
 !   This routine computes pi, log(2) and egamma, and stores this data in the
-!   proper arrays in module MPFUNA.  MPNW is the largest precision level
-!   (in words) that will be subsequently required for this run at the user level. 
+!   proper arrays in module MPFUNA. MPNW is the largest precision level
+!   (in words) that will be subsequently required for this run at the user level.
 
 implicit none
 integer, intent(in):: mpnw
 integer nwds, nwds6
 
-!   Add three words to mpnw, since many of the routines in this module 
+!  End of declaration
+
+!   Add three words to mpnw, since many of the routines in this module
 !   increase the working precision level by one word upon entry.
 
 nwds = mpnw + 3
@@ -1191,31 +1190,31 @@ subroutine mplog (a, b, mpnw)
 
 implicit none
 integer, intent(in):: mpnw
-integer ia, iq, is, itrmax, i1, k, mpnw1, mq, na, nit, n1
-real (mprknd) alt, cl2, rtol, st, tol, t1, t2
-parameter (alt = 0.693147180559945309d0, cl2 = 1.4426950408889633d0, &
-  rtol = 0.5d0**7, itrmax = 1000000, nit = 3)
 integer (mpiknd), intent(in):: a(0:)
 integer (mpiknd), intent(out):: b(0:)
+integer, parameter:: itrmax = 1000000, nit = 3
+real (mprknd), parameter:: alt = 0.693147180559945309d0, cl2 = 1.4426950408889633d0, &
+  rtol = 0.5d0**7
+integer ia, iq, is, i1, k, mpnw1, mq, na, n1
+real (mprknd) st, tol, t1, t2
 integer (mpiknd) f1(0:8), s0(0:mpnw+6), s1(0:mpnw+6), s2(0:mpnw+6), &
   s3(0:mpnw+6), s4(0:mpnw+6)
 
 ! End of declaration
 
-if (mpnw < 4 .or. a(0) < mpnw + 4 .or. a(0) < abs (a(2)) + 4 .or. &
-  b(0) < mpnw + 6) then
+if (mpnw < 4 .or. b(0) < mpnw + 6) then
   write (mpldb, 1)
 1 format ('*** MPLOG: uninitialized or inadequately sized arrays')
-  call mpabrt (99)
+  call mpabrt ( 425)
 endif
 
 ia = sign (int (1, mpiknd), a(2))
 na = min (int (abs (a(2))), mpnw)
 
-if (ia .lt. 0 .or. na == 0) then
+if (ia < 0 .or. na == 0) then
   write (mpldb, 2)
 2 format ('*** MPLOG: Argument is less than or equal to zero.')
-  call mpabrt (50)
+  call mpabrt ( 426)
 endif
 
 !   Check if input is exactly one.
@@ -1249,8 +1248,8 @@ f1(6) = 0
 call mpsub (a, f1, s0, mpnw1)
 
 if (s0(2) == 0 .or. s0(3) <= min (-2.d0, - rtol * mpnw1)) then
-  call mpeq (s0, s1, mpnw1) 
-  call mpeq (s1, s2, mpnw1) 
+  call mpeq (s0, s1, mpnw1)
+  call mpeq (s1, s2, mpnw1)
   i1 = 1
   is = 1
   tol = s0(3) - mpnw1
@@ -1258,20 +1257,20 @@ if (s0(2) == 0 .or. s0(3) <= min (-2.d0, - rtol * mpnw1)) then
   do i1 = 2, itrmax
     is = - is
     st = is * i1
-    call mpmul (s1, s2, s3, mpnw1) 
-    call mpeq (s3, s2, mpnw1) 
-    call mpdivd (s3, st, s4, mpnw1) 
-    call mpadd (s0, s4, s3, mpnw1) 
-    call mpeq (s3, s0, mpnw1) 
+    call mpmul (s1, s2, s3, mpnw1)
+    call mpeq (s3, s2, mpnw1)
+    call mpdivd (s3, st, s4, mpnw1)
+    call mpadd (s0, s4, s3, mpnw1)
+    call mpeq (s3, s0, mpnw1)
     if (s4(2) == 0 .or. s4(3) < tol) goto 120
   enddo
-  
+
   write (mpldb, 3) itrmax
 3 format ('*** MPLOG: Iteration limit exceeded',i10)
-  call mpabrt (54)
+  call mpabrt ( 427)
 endif
 
-!   Determine the least integer MQ such that 2 ^ MQ .GE. MPNW.
+!   Determine the least integer MQ such that 2 ^ MQ >= MPNW.
 
 t2 = mpnw
 mq = cl2 * log (t2) + 2.d0 - mprdfz
@@ -1289,13 +1288,13 @@ iq = 0
 
 do k = 0, mq
   if (k > 1) mpnw1 = min (2 * mpnw1 - 2, mpnw) + 1
-  
+
 110  continue
 
-  call mpexp (s3, s0, mpnw1) 
-  call mpsub (a, s0, s1, mpnw1) 
-  call mpdiv (s1, s0, s2, mpnw1) 
-  call mpadd (s3, s2, s1, mpnw1) 
+  call mpexp (s3, s0, mpnw1)
+  call mpsub (a, s0, s1, mpnw1)
+  call mpdiv (s1, s0, s2, mpnw1)
+  call mpadd (s3, s2, s1, mpnw1)
   call mpeq (s1, s3, mpnw1)
   if (k == mq - nit .and. iq == 0) then
     iq = 1
@@ -1307,23 +1306,23 @@ enddo
 
 120 continue
 
-call mproun (s3, mpnw) 
+call mproun (s3, mpnw)
 call mpeq (s3, b, mpnw)
 
-130 continue 
+130 continue
 
 return
 end subroutine mplog
 
 subroutine mplog2q (alog2, mpnw)
 
-!   This computes log(2) to mpnw words precision, using an algorithm due to Salamin 
+!   This computes log(2) to mpnw words precision, using an algorithm due to Salamin
 !   and Brent:  Select n > 2^m, where m is the number of bits of desired precision
-!   precision in the result.  Then
+!   precision in the result. Then
 
 !   Log(2) = Pi / [2 AGM (1, 4/x)]
 
-!   Where AGM (a, b) denotes the arithmetic-geometric mean:  Set a_0 = a and 
+!   Where AGM (a, b) denotes the arithmetic-geometric mean:  Set a_0 = a and
 !   b_0 = b, then iterate
 !    a_{k+1} = (a_k + b_k)/2
 !    b_{k+1} = sqrt (a_k * b_k)
@@ -1331,10 +1330,10 @@ subroutine mplog2q (alog2, mpnw)
 
 implicit none
 integer, intent(in):: mpnw
-integer mpnw1, n, n1, n48
-real (mprknd) cpi, d1, t1
-parameter (cpi = 3.141592653589793238d0)
 integer (mpiknd), intent(out):: alog2(0:)
+real (mprknd), parameter:: cpi = 3.141592653589793238d0
+integer mpnw1, n, n1, n48
+real (mprknd) d1
 integer (mpiknd) f1(0:8), f4(0:8), s1(0:mpnw+6), s2(0:mpnw+6), s3(0:mpnw+6), &
   s4(0:mpnw+6)
 
@@ -1343,7 +1342,7 @@ integer (mpiknd) f1(0:8), f4(0:8), s1(0:mpnw+6), s2(0:mpnw+6), s3(0:mpnw+6), &
 if (mpnw < 4 .or. alog2(0) < mpnw + 6) then
   write (mpldb, 1)
 1 format ('*** MPLOG2Q: uninitialized or inadequately sized arrays')
-  call mpabrt (99)
+  call mpabrt ( 428)
 endif
 
 !   Define sections of the scratch array.
@@ -1369,7 +1368,7 @@ if (abs (d1 - cpi) > mprdfz .or. mppicon(1) < mpnw) then
   write (mpldb, 2) mpnw
 2 format ('*** MPLOG2Q: Pi must be precomputed to precision',i9,' words.'/ &
   'See documentation for details.')
-  call mpabrt (53)
+  call mpabrt ( 429)
 endif
 
 !   Define sections of the scratch array.
@@ -1416,14 +1415,14 @@ s4(6) = 0
 
 !   Perform AGM iterations.
 
-call mpeq (f1, s1, mpnw1) 
+call mpeq (f1, s1, mpnw1)
 call mpdiv (f4, s4, s2, mpnw1)
-call mpagmr (s1, s2, s3, mpnw1) 
+call mpagmr (s1, s2, s3, mpnw1)
 
 !   Set Log(2) = Pi / (2 * N * S3), where S3 is the limit of the AGM iterations.
 
 call mpmuld (s3, 2.d0 * n, s1, mpnw1)
-call mpdiv (mppicon, s1, s2, mpnw1) 
+call mpdiv (mppicon, s1, s2, mpnw1)
 call mproun (s2, mpnw)
 call mpeq (s2, alog2, mpnw)
 
@@ -1453,19 +1452,19 @@ subroutine mppiq (pi, mpnw)
 
 implicit none
 integer, intent(in):: mpnw
-integer k, mpnw1, mq
 integer (mpiknd), intent(out):: pi(0:)
+real (mprknd), parameter:: cl2 = 1.4426950408889633d0
+integer k, mpnw1, mq
+real (mprknd) t1
 integer (mpiknd) f(0:8), s0(0:mpnw+6), s1(0:mpnw+6), s2(0:mpnw+6), s3(0:mpnw+6), &
   s4(0:mpnw+6)
-real (mprknd) cl2, t1
-parameter (cl2 = 1.4426950408889633d0)
 
 ! End of declaration
 
 if (mpnw < 4 .or. pi(0) < mpnw + 6) then
   write (mpldb, 1)
 1 format ('*** MPPIQ: uninitialized or inadequately sized arrays')
-  call mpabrt (99)
+  call mpabrt ( 430)
 endif
 
 s0(0) = mpnw + 7
@@ -1503,8 +1502,8 @@ f(3) = 0
 f(4) = 2
 f(5) = 0
 f(6) = 0
-call mpsqrt (f, s2, mpnw1) 
-call mpmuld (s2, 0.5d0, s1, mpnw1) 
+call mpsqrt (f, s2, mpnw1)
+call mpmuld (s2, 0.5d0, s1, mpnw1)
 f(3) = -1
 f(4) = 0.5d0 * mpbdx
 call mpsub (s2, f, s4, mpnw1)
@@ -1512,28 +1511,28 @@ call mpsub (s2, f, s4, mpnw1)
 !   Perform iterations as described above.
 
 do k = 1, mq
-  call mpadd (s0, s1, s2, mpnw1) 
-  call mpmul (s0, s1, s3, mpnw1) 
-  call mpsqrt (s3, s1, mpnw1) 
-  call mpmuld (s2, 0.5d0, s0, mpnw1) 
-  call mpsub (s0, s1, s2, mpnw1) 
-  call mpmul (s2, s2, s3, mpnw1) 
+  call mpadd (s0, s1, s2, mpnw1)
+  call mpmul (s0, s1, s3, mpnw1)
+  call mpsqrt (s3, s1, mpnw1)
+  call mpmuld (s2, 0.5d0, s0, mpnw1)
+  call mpsub (s0, s1, s2, mpnw1)
+  call mpmul (s2, s2, s3, mpnw1)
   t1 = 2.d0 ** k
-  call mpmuld (s3, t1, s2, mpnw1) 
-  call mpsub (s4, s2, s3, mpnw1) 
+  call mpmuld (s3, t1, s2, mpnw1)
+  call mpsub (s4, s2, s3, mpnw1)
   call mpeq (s3, s4, mpnw1)
 enddo
 
 !   Complete computation.
 
-call mpadd (s0, s1, s2, mpnw1) 
-call mpmul (s2, s2, s2, mpnw1) 
-call mpdiv (s2, s4, s2, mpnw1) 
-call mpeq (s2, s0, mpnw1) 
+call mpadd (s0, s1, s2, mpnw1)
+call mpmul (s2, s2, s2, mpnw1)
+call mpdiv (s2, s4, s2, mpnw1)
+call mpeq (s2, s0, mpnw1)
 
 !   Restore original precision level.
 
-call mproun (s0, mpnw) 
+call mproun (s0, mpnw)
 call mpeq (s0, pi, mpnw)
 
 100 continue
@@ -1543,34 +1542,34 @@ end subroutine mppiq
 
 subroutine mppower (a, b, c, mpnw)
 
-!   This computes C = A ^ B, where A, B and C are MPR.  It first checks if
+!   This computes C = A ^ B, where A, B and C are MPR. It first checks if
 !   B is the quotient of two integers up to 10^7 in size, in which case it
-!   calls MPNPWR and MPNRTR.  Otherwise it calls MPLOG and MPEXP.
+!   calls MPNPWR and MPNRTR. Otherwise it calls MPLOG and MPEXP.
 
 implicit none
 integer, intent(in):: mpnw
-integer i, n1
-real (mprknd) a1, a2, a3, a4, a5, a6, q1, t0, t1, t2, t3, mprxx
-parameter (mprxx = 5.d-10)
 integer (mpiknd), intent(in):: a(0:), b(0:)
 integer (mpiknd), intent(Out):: c(0:)
+real (mprknd), parameter:: mprxx = 5.d-10
+integer i, n1
+real (mprknd) a1, a2, a3, a4, a5, a6, q1, t0, t1, t2, t3
 integer (mpiknd) s0(0:mpnw+6), s1(0:mpnw+6), s2(0:mpnw+6)
-  
+
 !  End of declaration
 
-if (mpnw < 4 .or. a(0) < mpnw + 4 .or. b(0) < abs (a(2)) + 4 .or. &
-  c(0) < mpnw + 6) then
+if (mpnw < 4 .or. c(0) < mpnw + 6) then
   write (mpldb, 1)
 1 format ('*** MPPOWER: uninitialized or inadequately sized arrays')
-  call mpabrt (99)
+  call mpabrt ( 431)
 endif
 
-!   Check if A <= 0 (error), or A = 1 or B = 0 or B = 1.
+!   Check if A < 0 or A = 0 and B < 0 (error); if A = 1 or B = 0 then
+!   result = 1; if B = 1 then result = A.
 
-if (a(2) <= 0) then
+if (a(2) < 0 .or. a(2) == 0 .and. B(2) < 0) then
   write (mpldb, 2)
-2 format ('*** MPPOWER: A^B, where A is less than zero.')
-  call mpabrt (61)
+2 format ('*** MPPOWER: A^B, where A < 0 or A = 0 and B < 0.')
+  call mpabrt ( 432)
 elseif ((a(2) == 1 .and. a(3) == 0 .and. a(4) == 1) &
   .or. b(2) == 0) then
   c(1) = mpnw
@@ -1613,7 +1612,7 @@ if (n1 >= -mpnbt .and. n1 <= mpnbt) then
     a2 = a4
     a3 = a5
     a4 = a6
-    if (t2 < mprxx) goto 100       
+    if (t2 < mprxx) goto 100
   enddo
 
   goto 110
