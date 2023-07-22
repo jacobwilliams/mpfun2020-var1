@@ -1,6 +1,6 @@
 !*****************************************************************************
 
-!  MPFUN20-Fort: A thread-safe arbitrary precision computation package
+!  MPFUN20-Fort: A thread-safe arbitrary precision package with special functions
 !  Main high-precision language interface module (module MPFUNG)
 !  Variant 1: Precision level arguments are NOT required.
 
@@ -8,7 +8,7 @@
 !  the variant files of this module using the gencodes.f90 program. Do not
 !  change these comments.
 
-!  Revision date:  27 Dec 2021
+!  Revision date:  10 Jun 2023
 
 !  AUTHOR:
 !    David H. Bailey
@@ -16,15 +16,15 @@
 !    Email: dhbailey@lbl.gov
 
 !  COPYRIGHT AND DISCLAIMER:
-!    All software in this package (c) 2021 David H. Bailey.
+!    All software in this package (c) 2023 David H. Bailey.
 !    By downloading or using this software you agree to the copyright, disclaimer
 !    and license agreement in the accompanying file DISCLAIMER.txt.
 
 !  PURPOSE OF PACKAGE:
 !    This package permits one to perform floating-point computations (real and
 !    complex) to arbitrarily high numeric precision, by making only relatively
-!    minor changes to existing Fortran-90 programs.  All basic arithmetic
-!    operations and transcendental functions are supported, together with several
+!    minor changes to existing Fortran-90 programs. All basic arithmetic
+!    operations and transcendental functions are supported, together with numerous
 !    special functions.
 
 !    In addition to fast execution times, one key feature of this package is a
@@ -118,20 +118,23 @@ private &
 private &
   mp_absr, mp_absz, mp_acos, mp_acosh, mp_agm, mp_aimag, mp_aint, &
   mp_anint, mp_asin, mp_asinh, mp_atan, mp_atan2, mp_atanh, mp_ator1, &
-  mp_atorn, mp_berne, mp_bessel_in, mp_bessel_j0, mp_bessel_j1, &
-  mp_bessel_jn, mp_bessel_kn, mp_bessel_yn, mp_bessel_y0, mp_bessel_y1, &
-  mp_binmd, mp_ccos, mp_cexp, mp_clog, mp_conjg, mp_cos, mp_cosh, &
-  mp_csin, mp_csqrt, mp_cssh, mp_cssn, mp_dctoz, mp_dctoz2, mp_decmd, &
-  mp_dtor, mp_dtor2, mp_eform, mp_egamma, mp_erf, mp_erfc, mp_exp, &
-  mp_fform, mp_gamma, mp_hypot, mp_incgamma, mp_init, mp_log, mp_log2, &
-  mp_max, mp_min, mp_mod, mp_mtor, mp_nrt, mp_pi, mp_polylog_ini, &
-  mp_polylog_neg, mp_polylog_pos, mp_prodd, mp_prodq, mp_qtor, mp_qtor2, &
-  mp_quotd, mp_quotq, mp_rand, mp_readr1, mp_readr2, mp_readr3, &
-  mp_readr4, mp_readr5, mp_readz1, mp_readz2, mp_readz3, mp_readz4, &
-  mp_readz5, mp_rtod, mp_rtoq, mp_rtor, mp_rtoz, mp_setwp, mp_sign, &
-  mp_sin, mp_sinh, mp_sqrt, mp_tan, mp_tanh, mp_wprec, mp_wprecz, &
-  mp_writer, mp_writez, mp_zeta, mp_zetaem, mp_zeta_int, mp_ztodc, &
-  mp_ztor, mp_ztoz, mp_zmtoz
+  mp_atorn, mp_berne, mp_bessel_i, mp_bessel_in, mp_bessel_j, &
+  mp_bessel_j0, mp_bessel_j1, mp_bessel_jn, mp_bessel_k, mp_bessel_kn, &
+  mp_bessel_y, mp_bessel_yn, mp_bessel_y0, mp_bessel_y1, mp_binmd, &
+  mp_ccos, mp_cexp, mp_clog, mp_conjg, mp_cos, mp_cosh, mp_csin, &
+  mp_csqrt, mp_cssh, mp_cssn, mp_dctoz, mp_dctoz2, mp_decmd, &
+  mp_digamma_be, mp_dtor, mp_dtor2, mp_eform, mp_egamma, mp_erf, &
+  mp_erfc, mp_exp, mp_expint, mp_fform, mp_gamma, mp_hurwitz_zetan, &
+  mp_hurwitz_zetan_be, mp_hypergeom_pfq, mp_hypot, mp_incgamma, &
+  mp_init, mp_log, mp_log10, mp_log2, mp_max, mp_min, mp_mod, mp_mtor, &
+  mp_nrt, mp_pi, mp_polygamma, mp_polygamma_be, mp_polylog_ini, &
+  mp_polylog_neg, mp_polylog_pos, mp_prodd, mp_prodq, mp_qtor, &
+  mp_qtor2, mp_quotd, mp_quotq, mp_rand, mp_readr1, mp_readr2, &
+  mp_readr3, mp_readr4, mp_readr5, mp_readz1, mp_readz2, mp_readz3, &
+  mp_readz4, mp_readz5, mp_rtod, mp_rtoq, mp_rtor, mp_rtoz, mp_setwp, &
+  mp_sign, mp_sin, mp_sinh, mp_sqrt, mp_struve_hn, mp_tan, mp_tanh, &
+  mp_wprec, mp_wprecz, mp_writer, mp_writez, mp_zeta, mp_zeta_be, &
+  mp_zeta_int, mp_ztodc, mp_ztor, mp_ztoz, mp_zmtoz
 
 !  Operator extension interface blocks:
 
@@ -225,7 +228,7 @@ interface operator (**)
    module procedure mp_expzr
 end interface
 
-interface operator (.eq.)
+interface operator (==)
   module procedure mp_eqtrr
   module procedure mp_eqtdr
   module procedure mp_eqtrd
@@ -240,7 +243,7 @@ interface operator (.eq.)
   module procedure mp_eqtzr
 end interface
 
-interface operator (.ne.)
+interface operator (/=)
   module procedure mp_netrr
   module procedure mp_netdr
   module procedure mp_netrd
@@ -255,7 +258,7 @@ interface operator (.ne.)
   module procedure mp_netzr
 end interface
 
-interface operator (.le.)
+interface operator (<=)
   module procedure mp_letrr
   module procedure mp_letdr
   module procedure mp_letrd
@@ -263,7 +266,7 @@ interface operator (.le.)
   module procedure mp_letri
 end interface
 
-interface operator (.ge.)
+interface operator (>=)
   module procedure mp_getrr
   module procedure mp_getdr
   module procedure mp_getrd
@@ -271,7 +274,7 @@ interface operator (.ge.)
   module procedure mp_getri
 end interface
 
-interface operator (.lt.)
+interface operator (<)
   module procedure mp_lttrr
   module procedure mp_lttdr
   module procedure mp_lttrd
@@ -279,7 +282,7 @@ interface operator (.lt.)
   module procedure mp_lttri
 end interface
 
-interface operator (.gt.)
+interface operator (>)
   module procedure mp_gttrr
   module procedure mp_gttdr
   module procedure mp_gttrd
@@ -287,7 +290,7 @@ interface operator (.gt.)
   module procedure mp_gttri
 end interface
 
-!  MP generic function interface blogs, listed alphabetically by interface name:
+!  MP generic function interface blocks, listed alphabetically by interface name:
 
 interface abs
   module procedure mp_absr
@@ -342,8 +345,16 @@ interface mpberne
   module procedure mp_berne
 end interface
 
+interface bessel_i
+  module procedure mp_bessel_i
+end interface
+
 interface bessel_in
   module procedure mp_bessel_in
+end interface
+
+interface bessel_j
+  module procedure mp_bessel_j
 end interface
 
 interface bessel_jn
@@ -358,8 +369,16 @@ interface bessel_j1
   module procedure mp_bessel_j1
 end interface
 
+interface bessel_k
+  module procedure mp_bessel_k
+end interface
+
 interface bessel_kn
   module procedure mp_bessel_kn
+end interface
+
+interface bessel_y
+  module procedure mp_bessel_y
 end interface
 
 interface bessel_yn
@@ -395,6 +414,10 @@ interface dcmplx
   module procedure mp_ztodc
 end interface
 
+interface digamma_be
+  module procedure mp_digamma_be
+end interface
+
 interface erf
   module procedure mp_erf
 end interface
@@ -408,8 +431,24 @@ interface exp
   module procedure mp_cexp
 end interface
 
+interface expint
+  module procedure mp_expint
+end interface
+
 interface gamma
   module procedure mp_gamma
+end interface
+
+interface hurwitz_zetan
+  module procedure mp_hurwitz_zetan
+end interface
+
+interface hurwitz_zetan_be
+  module procedure mp_hurwitz_zetan_be
+end interface
+
+interface hypergeom_pfq
+  module procedure mp_hypergeom_pfq
 end interface
 
 interface hypot
@@ -419,6 +458,10 @@ end interface
 interface log
   module procedure mp_log
   module procedure mp_clog
+end interface
+
+interface log10
+  module procedure mp_log10
 end interface
 
 interface max
@@ -547,6 +590,14 @@ interface mpwrite
   module procedure mp_writez
 end interface
 
+interface polygamma
+  module procedure mp_polygamma
+end interface
+
+interface polygamma_be
+  module procedure mp_polygamma_be
+end interface
+
 interface polylog_ini
   module procedure mp_polylog_ini
 end interface
@@ -581,6 +632,10 @@ interface sqrt
   module procedure mp_csqrt
 end interface
 
+interface struve_hn
+  module procedure mp_struve_hn
+end interface
+
 interface tan
   module procedure mp_tan
 end interface
@@ -593,8 +648,8 @@ interface zeta
   module procedure mp_zeta
 end interface
 
-interface zetaem
-  module procedure mp_zetaem
+interface zeta_be
+  module procedure mp_zeta_be
 end interface
 
 interface zeta_int
@@ -613,7 +668,7 @@ contains
 1       format ( &
         '*** MP_SETWP: requested precision level exceeds default precision.'/ &
         'Increase default precision in module MPFUNF.')
-      call mpabrt (98)
+      call mpabrt ( 701)
     endif
     mp_setwp = iprec
   end function
@@ -1254,8 +1309,7 @@ contains
     integer mpnw
     mpnw = min (int (ra%mpr(1)), mpwds)
     mp_negr%mpr(0) = mpwds6
-    call mpeq (ra%mpr, mp_negr%mpr, mpnw)
-    mp_negr%mpr(2) = - ra%mpr(2)
+    call mpneg (ra%mpr, mp_negr%mpr, mpnw)
     return
   end function
 
@@ -1792,7 +1846,7 @@ contains
     mpnw = max (int (ra%mpr(1)), int (rb%mpr(1)))
     mpnw = min (mpnw, mpwds)
     call mpcpr (ra%mpr, rb%mpr, ic, mpnw)
-    if (ic .eq. 0) then
+    if (ic == 0) then
       mp_eqtrr = .true.
     else
       mp_eqtrr = .false.
@@ -1812,7 +1866,7 @@ contains
     i1 = 0
     call mpdmc40 (da, i1, r1%mpr, mpnw)
     call mpcpr (r1%mpr, rb%mpr, ic, mpnw)
-    if (ic .eq. 0) then
+    if (ic == 0) then
       mp_eqtdr = .true.
     else
       mp_eqtdr = .false.
@@ -1832,7 +1886,7 @@ contains
     i1 = 0
     call mpdmc40 (db, i1, r1%mpr, mpnw)
     call mpcpr (ra%mpr, r1%mpr, ic, mpnw)
-    if (ic .eq. 0) then
+    if (ic == 0) then
       mp_eqtrd = .true.
     else
       mp_eqtrd = .false.
@@ -1854,7 +1908,7 @@ contains
     i1 = 0
     call mpdmc40 (da, i1, r1%mpr, mpnw)
     call mpcpr (r1%mpr, rb%mpr, ic, mpnw)
-    if (ic .eq. 0) then
+    if (ic == 0) then
       mp_eqtir = .true.
     else
       mp_eqtir = .false.
@@ -1876,7 +1930,7 @@ contains
     i1 = 0
     call mpdmc40 (db, i1, r1%mpr, mpnw)
     call mpcpr (ra%mpr, r1%mpr, ic, mpnw)
-    if (ic .eq. 0) then
+    if (ic == 0) then
       mp_eqtri = .true.
     else
       mp_eqtri = .false.
@@ -1896,7 +1950,7 @@ contains
     mpnw = min (mpnw, mpwds)
     call mpcpr (za%mpc, zb%mpc, ic1, mpnw)
     call mpcpr (za%mpc(l1:), zb%mpc(l2:), ic2, mpnw)
-    if (ic1 .eq. 0 .and. ic2 .eq. 0) then
+    if (ic1 == 0 .and. ic2 == 0) then
       mp_eqtzz = .true.
     else
       mp_eqtzz = .false.
@@ -1923,7 +1977,7 @@ contains
     call mpdmc40 (d1, 0, z1%mpc(l2:), mpnw)
     call mpcpr (z1%mpc, zb%mpc, ic1, mpnw)
     call mpcpr (z1%mpc(l2:), zb%mpc(l1:), ic2, mpnw)
-    if (ic1 .eq. 0 .and. ic2 .eq. 0) then
+    if (ic1 == 0 .and. ic2 == 0) then
       mp_eqtdz = .true.
     else
       mp_eqtdz = .false.
@@ -1950,7 +2004,7 @@ contains
     call mpdmc40 (d1, 0, z1%mpc(l2:), mpnw)
     call mpcpr (za%mpc, z1%mpc, ic1, mpnw)
     call mpcpr (za%mpc(l1:), z1%mpc(l2:), ic2, mpnw)
-    if (ic1 .eq. 0 .and. ic2 .eq. 0) then
+    if (ic1 == 0 .and. ic2 == 0) then
       mp_eqtzd = .true.
     else
       mp_eqtzd = .false.
@@ -1975,7 +2029,7 @@ contains
     call mpdmc40 (aimag (dca), 0, z1%mpc(l2:), mpnw)
     call mpcpr (z1%mpc, zb%mpc, ic1, mpnw)
     call mpcpr (z1%mpc(l2:), zb%mpc(l1:), ic2, mpnw)
-    if (ic1 .eq. 0 .and. ic2 .eq. 0) then
+    if (ic1 == 0 .and. ic2 == 0) then
       mp_eqtdcz = .true.
     else
       mp_eqtdcz = .false.
@@ -2000,7 +2054,7 @@ contains
     call mpdmc40 (aimag (dcb), 0, z1%mpc(l2:), mpnw)
     call mpcpr (za%mpc, z1%mpc, ic1, mpnw)
     call mpcpr (za%mpc(l1:), z1%mpc(l2:), ic2, mpnw)
-    if (ic1 .eq. 0 .and. ic2 .eq. 0) then
+    if (ic1 == 0 .and. ic2 == 0) then
       mp_eqtzdc = .true.
     else
       mp_eqtzdc = .false.
@@ -2019,7 +2073,7 @@ contains
     mpnw = min (mpnw, mpwds)
     call mpcpr (ra%mpr, zb%mpc, ic1, mpnw)
     ic2 = int (zb%mpc(l2+2))
-    if (ic1 .eq. 0 .and. ic2 .eq. 0) then
+    if (ic1 == 0 .and. ic2 == 0) then
       mp_eqtrz = .true.
     else
       mp_eqtrz = .false.
@@ -2038,7 +2092,7 @@ contains
     mpnw = min (mpnw, mpwds)
     call mpcpr (za%mpc, rb%mpr, ic1, mpnw)
     ic2 = int (za%mpc(l1+2))
-    if (ic1 .eq. 0 .and. ic2 .eq. 0) then
+    if (ic1 == 0 .and. ic2 == 0) then
       mp_eqtzr = .true.
     else
       mp_eqtzr = .false.
@@ -2056,7 +2110,7 @@ contains
     mpnw = max (int (ra%mpr(1)), int (rb%mpr(1)))
     mpnw = min (mpnw, mpwds)
     call mpcpr (ra%mpr, rb%mpr, ic, mpnw)
-    if (ic .ne. 0) then
+    if (ic /= 0) then
       mp_netrr = .true.
     else
       mp_netrr = .false.
@@ -2076,7 +2130,7 @@ contains
     i1 = 0
     call mpdmc40 (da, i1, r1%mpr, mpnw)
     call mpcpr (r1%mpr, rb%mpr, ic, mpnw)
-    if (ic .ne. 0) then
+    if (ic /= 0) then
       mp_netdr = .true.
     else
       mp_netdr = .false.
@@ -2096,7 +2150,7 @@ contains
     i1 = 0
     call mpdmc40 (db, i1, r1%mpr, mpnw)
     call mpcpr (ra%mpr, r1%mpr, ic, mpnw)
-    if (ic .ne. 0) then
+    if (ic /= 0) then
       mp_netrd = .true.
     else
       mp_netrd = .false.
@@ -2118,7 +2172,7 @@ contains
     i1 = 0
     call mpdmc40 (da, i1, r1%mpr, mpnw)
     call mpcpr (r1%mpr, rb%mpr, ic, mpnw)
-    if (ic .ne. 0) then
+    if (ic /= 0) then
       mp_netir = .true.
     else
       mp_netir = .false.
@@ -2140,7 +2194,7 @@ contains
     i1 = 0
     call mpdmc40 (db, i1, r1%mpr, mpnw)
     call mpcpr (ra%mpr, r1%mpr, ic, mpnw)
-    if (ic .ne. 0) then
+    if (ic /= 0) then
       mp_netri = .true.
     else
       mp_netri = .false.
@@ -2160,7 +2214,7 @@ contains
     mpnw = min (mpnw, mpwds)
     call mpcpr (za%mpc, zb%mpc, ic1, mpnw)
     call mpcpr (za%mpc(l1:), zb%mpc(l2:), ic2, mpnw)
-    if (ic1 .ne. 0 .or. ic2 .ne. 0) then
+    if (ic1 /= 0 .or. ic2 /= 0) then
       mp_netzz = .true.
     else
       mp_netzz = .false.
@@ -2187,7 +2241,7 @@ contains
     call mpdmc40 (d1, 0, z1%mpc(l2:), mpnw)
     call mpcpr (z1%mpc, zb%mpc, ic1, mpnw)
     call mpcpr (z1%mpc(l2:), zb%mpc(l1:), ic2, mpnw)
-    if (ic1 .ne. 0 .or. ic2 .ne. 0) then
+    if (ic1 /= 0 .or. ic2 /= 0) then
       mp_netdz = .true.
     else
       mp_netdz = .false.
@@ -2214,7 +2268,7 @@ contains
     call mpdmc40 (d1, 0, z1%mpc(l2:), mpnw)
     call mpcpr (za%mpc, z1%mpc, ic1, mpnw)
     call mpcpr (za%mpc(l1:), z1%mpc(l2:), ic2, mpnw)
-    if (ic1 .ne. 0 .or. ic2 .ne. 0) then
+    if (ic1 /= 0 .or. ic2 /= 0) then
       mp_netzd = .true.
     else
       mp_netzd = .false.
@@ -2239,7 +2293,7 @@ contains
     call mpdmc40 (aimag (dca), 0, z1%mpc(l2:), mpnw)
     call mpcpr (z1%mpc, zb%mpc, ic1, mpnw)
     call mpcpr (z1%mpc(l2:), zb%mpc(l1:), ic2, mpnw)
-    if (ic1 .ne. 0 .or. ic2 .ne. 0) then
+    if (ic1 /= 0 .or. ic2 /= 0) then
       mp_netdcz = .true.
     else
       mp_netdcz = .false.
@@ -2264,7 +2318,7 @@ contains
     call mpdmc40 (aimag (dcb), 0, z1%mpc(l2:), mpnw)
     call mpcpr (za%mpc, z1%mpc, ic1, mpnw)
     call mpcpr (za%mpc(l1:), z1%mpc(l2:), ic2, mpnw)
-    if (ic1 .ne. 0 .or. ic2 .ne. 0) then
+    if (ic1 /= 0 .or. ic2 /= 0) then
       mp_netzdc = .true.
     else
       mp_netzdc = .false.
@@ -2283,7 +2337,7 @@ contains
     mpnw = min (mpnw, mpwds)
     call mpcpr (ra%mpr, zb%mpc, ic1, mpnw)
     ic2 = int (zb%mpc(l2+2))
-    if (ic1 .ne. 0 .or. ic2 .ne. 0) then
+    if (ic1 /= 0 .or. ic2 /= 0) then
       mp_netrz = .true.
     else
       mp_netrz = .false.
@@ -2302,7 +2356,7 @@ contains
     mpnw = min (mpnw, mpwds)
     call mpcpr (za%mpc, rb%mpr, ic1, mpnw)
     ic2 = int (za%mpc(l1+2))
-    if (ic1 .ne. 0 .or. ic2 .ne. 0) then
+    if (ic1 /= 0 .or. ic2 /= 0) then
       mp_netzr = .true.
     else
       mp_netzr = .false.
@@ -2320,7 +2374,7 @@ contains
     mpnw = max (int (ra%mpr(1)), int (rb%mpr(1)))
     mpnw = min (mpnw, mpwds)
     call mpcpr (ra%mpr, rb%mpr, ic, mpnw)
-    if (ic .le. 0) then
+    if (ic <= 0) then
       mp_letrr = .true.
     else
       mp_letrr = .false.
@@ -2340,7 +2394,7 @@ contains
     i1 = 0
     call mpdmc40 (da, i1, r1%mpr, mpnw)
     call mpcpr (r1%mpr, rb%mpr, ic, mpnw)
-    if (ic .le. 0) then
+    if (ic <= 0) then
       mp_letdr = .true.
     else
       mp_letdr = .false.
@@ -2360,7 +2414,7 @@ contains
     i1 = 0
     call mpdmc40 (db, i1, r1%mpr, mpnw)
     call mpcpr (ra%mpr, r1%mpr, ic, mpnw)
-    if (ic .le. 0) then
+    if (ic <= 0) then
       mp_letrd = .true.
     else
       mp_letrd = .false.
@@ -2382,7 +2436,7 @@ contains
     i1 = 0
     call mpdmc40 (da, i1, r1%mpr, mpnw)
     call mpcpr (r1%mpr, rb%mpr, ic, mpnw)
-    if (ic .le. 0) then
+    if (ic <= 0) then
       mp_letir = .true.
     else
       mp_letir = .false.
@@ -2404,7 +2458,7 @@ contains
     i1 = 0
     call mpdmc40 (db, i1, r1%mpr, mpnw)
     call mpcpr (ra%mpr, r1%mpr, ic, mpnw)
-    if (ic .le. 0) then
+    if (ic <= 0) then
       mp_letri = .true.
     else
       mp_letri = .false.
@@ -2422,7 +2476,7 @@ contains
     mpnw = max (int (ra%mpr(1)), int (rb%mpr(1)))
     mpnw = min (mpnw, mpwds)
     call mpcpr (ra%mpr, rb%mpr, ic, mpnw)
-    if (ic .ge. 0) then
+    if (ic >= 0) then
       mp_getrr = .true.
     else
       mp_getrr = .false.
@@ -2442,7 +2496,7 @@ contains
     i1 = 0
     call mpdmc40 (da, i1, r1%mpr, mpnw)
     call mpcpr (r1%mpr, rb%mpr, ic, mpnw)
-    if (ic .ge. 0) then
+    if (ic >= 0) then
       mp_getdr = .true.
     else
       mp_getdr = .false.
@@ -2462,7 +2516,7 @@ contains
     i1 = 0
     call mpdmc40 (db, i1, r1%mpr, mpnw)
     call mpcpr (ra%mpr, r1%mpr, ic, mpnw)
-    if (ic .ge. 0) then
+    if (ic >= 0) then
       mp_getrd = .true.
     else
       mp_getrd = .false.
@@ -2484,7 +2538,7 @@ contains
     i1 = 0
     call mpdmc40 (da, i1, r1%mpr, mpnw)
     call mpcpr (r1%mpr, rb%mpr, ic, mpnw)
-    if (ic .ge. 0) then
+    if (ic >= 0) then
       mp_getir = .true.
     else
       mp_getir = .false.
@@ -2506,7 +2560,7 @@ contains
     i1 = 0
     call mpdmc40 (db, i1, r1%mpr, mpnw)
     call mpcpr (ra%mpr, r1%mpr, ic, mpnw)
-    if (ic .ge. 0) then
+    if (ic >= 0) then
       mp_getri = .true.
     else
       mp_getri = .false.
@@ -2524,7 +2578,7 @@ contains
     mpnw = max (int (ra%mpr(1)), int (rb%mpr(1)))
     mpnw = min (mpnw, mpwds)
     call mpcpr (ra%mpr, rb%mpr, ic, mpnw)
-    if (ic .lt. 0) then
+    if (ic < 0) then
       mp_lttrr = .true.
     else
       mp_lttrr = .false.
@@ -2544,7 +2598,7 @@ contains
     i1 = 0
     call mpdmc40 (da, i1, r1%mpr, mpnw)
     call mpcpr (r1%mpr, rb%mpr, ic, mpnw)
-    if (ic .lt. 0) then
+    if (ic < 0) then
       mp_lttdr = .true.
     else
       mp_lttdr = .false.
@@ -2564,7 +2618,7 @@ contains
     i1 = 0
     call mpdmc40 (db, i1, r1%mpr, mpnw)
     call mpcpr (ra%mpr, r1%mpr, ic, mpnw)
-    if (ic .lt. 0) then
+    if (ic < 0) then
       mp_lttrd = .true.
     else
       mp_lttrd = .false.
@@ -2586,7 +2640,7 @@ contains
     i1 = 0
     call mpdmc40 (da, i1, r1%mpr, mpnw)
     call mpcpr (r1%mpr, rb%mpr, ic, mpnw)
-    if (ic .lt. 0) then
+    if (ic < 0) then
       mp_lttir = .true.
     else
       mp_lttir = .false.
@@ -2608,7 +2662,7 @@ contains
     i1 = 0
     call mpdmc40 (db, i1, r1%mpr, mpnw)
     call mpcpr (ra%mpr, r1%mpr, ic, mpnw)
-    if (ic .lt. 0) then
+    if (ic < 0) then
       mp_lttri = .true.
     else
       mp_lttri = .false.
@@ -2626,7 +2680,7 @@ contains
     mpnw = max (int (ra%mpr(1)), int (rb%mpr(1)))
     mpnw = min (mpnw, mpwds)
     call mpcpr (ra%mpr, rb%mpr, ic, mpnw)
-    if (ic .gt. 0) then
+    if (ic > 0) then
       mp_gttrr = .true.
     else
       mp_gttrr = .false.
@@ -2646,7 +2700,7 @@ contains
     i1 = 0
     call mpdmc40 (da, i1, r1%mpr, mpnw)
     call mpcpr (r1%mpr, rb%mpr, ic, mpnw)
-    if (ic .gt. 0) then
+    if (ic > 0) then
       mp_gttdr = .true.
     else
       mp_gttdr = .false.
@@ -2666,7 +2720,7 @@ contains
     i1 = 0
     call mpdmc40 (db, i1, r1%mpr, mpnw)
     call mpcpr (ra%mpr, r1%mpr, ic, mpnw)
-    if (ic .gt. 0) then
+    if (ic > 0) then
       mp_gttrd = .true.
     else
       mp_gttrd = .false.
@@ -2688,7 +2742,7 @@ contains
     i1 = 0
     call mpdmc40 (da, i1, r1%mpr, mpnw)
     call mpcpr (r1%mpr, rb%mpr, ic, mpnw)
-    if (ic .gt. 0) then
+    if (ic > 0) then
       mp_gttir = .true.
     else
       mp_gttir = .false.
@@ -2710,7 +2764,7 @@ contains
     i1 = 0
     call mpdmc40 (db, i1, r1%mpr, mpnw)
     call mpcpr (ra%mpr, r1%mpr, ic, mpnw)
-    if (ic .gt. 0) then
+    if (ic > 0) then
       mp_gttri = .true.
     else
       mp_gttri = .false.
@@ -2727,8 +2781,7 @@ contains
     integer mpnw
     mpnw = min (int (ra%mpr(1)), mpwds)
     mp_absr%mpr(0) = mpwds6
-    call mpeq (ra%mpr, mp_absr%mpr, mpnw)
-    mp_absr%mpr(2) = abs (ra%mpr(2))
+    call mpabs (ra%mpr, mp_absr%mpr, mpnw)
     return
   end function
 
@@ -2758,10 +2811,10 @@ contains
     call mpmul (ra%mpr, ra%mpr, r1%mpr, mpnw)
     call mpdmc (1.d0, 0, r2%mpr, mpnw)
     call mpsub (r2%mpr, r1%mpr, r3%mpr, mpnw)
-    if (r3%mpr(2) < 0.d0) then
+    if (r3%mpr(2) < 0) then
       write (mpldb, 1)
 1     format ('*** MP_ACOS: argument is not in (-1, 1).')
-      call mpabrt (24)
+      call mpabrt ( 702)
     endif
     call mpsqrt (r3%mpr, r1%mpr, mpnw)
     mp_acos%mpr(0) = mpwds6
@@ -2783,10 +2836,10 @@ contains
     call mpmul (ra%mpr, ra%mpr, r1%mpr, mpnw)
     call mpdmc (1.d0, 0, r2%mpr, mpnw)
     call mpsub (r1%mpr, r2%mpr, r3%mpr, mpnw)
-    if (r3%mpr(2) < 0.d0) then
+    if (r3%mpr(2) < 0) then
       write (mpldb, 1)
 1     format ('*** MP_ACOSH: argument is not >= 1.')
-      call mpabrt (24)
+      call mpabrt ( 703)
     endif
     call mpsqrt (r3%mpr, r1%mpr, mpnw)
     call mpadd (ra%mpr, r1%mpr, r2%mpr, mpnw)
@@ -2856,10 +2909,10 @@ contains
     call mpmul (ra%mpr, ra%mpr, r1%mpr, mpnw)
     call mpdmc (1.d0, 0, r2%mpr, mpnw)
     call mpsub (r2%mpr, r1%mpr, r3%mpr, mpnw)
-    if (r3%mpr(2) < 0.d0) then
+    if (r3%mpr(2) < 0) then
       write (mpldb, 1)
 1     format ('*** MP_ASIN: argument is not in (-1, 1).')
-      call mpabrt (25)
+      call mpabrt ( 704)
     endif
     call mpsqrt (r3%mpr, r1%mpr, mpnw)
     mp_asin%mpr(0) = mpwds6
@@ -2928,10 +2981,10 @@ contains
     call mpadd (r1%mpr, ra%mpr, r2%mpr, mpnw)
     call mpsub (r1%mpr, ra%mpr, r3%mpr, mpnw)
     call mpdiv (r2%mpr, r3%mpr, r1%mpr, mpnw)
-    if (r1%mpr(2) < 0.d0) then
+    if (r1%mpr(2) < 0) then
       write (mpldb, 1)
 1     format ('*** MP_ATANH: argument is not in (-1, 1).')
-      call mpabrt (24)
+      call mpabrt ( 705)
     endif
     call mplog (r1%mpr, r2%mpr, mpnw)
     call mpmuld (r2%mpr, 0.5d0, mp_atanh%mpr, mpnw)
@@ -3013,6 +3066,17 @@ contains
     return
   end subroutine
 
+  function mp_bessel_i (qa, ra)
+    implicit none
+    type (mp_real):: mp_bessel_i
+    type (mp_real), intent (in):: qa, ra
+    integer mpnw
+    mpnw = min (int (qa%mpr(1)), int (ra%mpr(1)), mpwds)
+    mp_bessel_i%mpr(0) = mpwds6
+    call mpbesselir (qa%mpr, ra%mpr, mp_bessel_i%mpr, mpnw)
+    return
+  end function
+
   function mp_bessel_in (nu, ra)
     implicit none
     type (mp_real):: mp_bessel_in
@@ -3022,6 +3086,17 @@ contains
     mpnw = min (int (ra%mpr(1)), mpwds)
     mp_bessel_in%mpr(0) = mpwds6
     call mpbesselinr (nu, ra%mpr, mp_bessel_in%mpr, mpnw)
+    return
+  end function
+
+  function mp_bessel_j (qa, ra)
+    implicit none
+    type (mp_real):: mp_bessel_j
+    type (mp_real), intent (in):: qa, ra
+    integer mpnw
+    mpnw = min (int (qa%mpr(1)), int (ra%mpr(1)), mpwds)
+    mp_bessel_j%mpr(0) = mpwds6
+    call mpbesseljr (qa%mpr, ra%mpr, mp_bessel_j%mpr, mpnw)
     return
   end function
 
@@ -3061,6 +3136,17 @@ contains
     return
   end function
 
+  function mp_bessel_k (qa, ra)
+    implicit none
+    type (mp_real):: mp_bessel_k
+    type (mp_real), intent (in):: qa, ra
+    integer mpnw
+    mpnw = min (int (qa%mpr(1)), int (ra%mpr(1)), mpwds)
+    mp_bessel_k%mpr(0) = mpwds6
+    call mpbesselkr (qa%mpr, ra%mpr, mp_bessel_k%mpr, mpnw)
+    return
+  end function
+
   function mp_bessel_kn (nu, ra)
     implicit none
     type (mp_real):: mp_bessel_kn
@@ -3071,6 +3157,17 @@ contains
     mpnw = min (mpnw, mpwds)
     mp_bessel_kn%mpr(0) = mpwds6
     call mpbesselknr (nu, ra%mpr, mp_bessel_kn%mpr, mpnw)
+    return
+  end function
+
+  function mp_bessel_y (qa, ra)
+    implicit none
+    type (mp_real):: mp_bessel_y
+    type (mp_real), intent (in):: qa, ra
+    integer mpnw
+    mpnw = min (int (qa%mpr(1)), int (ra%mpr(1)), mpwds)
+    mp_bessel_y%mpr(0) = mpwds6
+    call mpbesselyr (qa%mpr, ra%mpr, mp_bessel_y%mpr, mpnw)
     return
   end function
 
@@ -3351,8 +3448,8 @@ contains
     type (mp_real), intent (in):: ra
     real (mprknd), intent (out):: db
     integer, intent (out):: ib
-    real (mprknd) alg102, dt1, dt2
-    parameter (alg102 = 0.301029995663981195d0)
+    real (mprknd), parameter:: alg102 = 0.301029995663981195d0
+    real (mprknd) dt1, dt2
     integer i1, mpnw
     mpnw = min (int (ra%mpr(1)), mpwds)
     call mpmdc (ra%mpr, dt1, i1, mpnw)
@@ -3366,6 +3463,20 @@ contains
       ib = 0
     endif
   end subroutine
+
+  function mp_digamma_be (nb, rb, rc)
+    implicit none
+    integer, intent (in):: nb
+    type (mp_real):: mp_digamma_be
+    type (mp_real), intent (in):: rb(nb), rc
+    integer n1, mpnw
+    mpnw = max (int (rb(1)%mpr(1)), int (rc%mpr(1)))
+    mpnw = min (mpnw, mpwds)
+    mp_digamma_be%mpr(0) = mpwds6
+    n1 = mpwds
+    call mpdigammabe (n1, nb, rb(1)%mpr, rc%mpr, mp_digamma_be%mpr, mpnw)
+    return
+  end function
 
   function mp_dtor (da, iprec)
     implicit none
@@ -3441,7 +3552,13 @@ contains
 !    mpnw = mp_setwp (iprec)
 !>>
     mp_egamma%mpr(0) = mpwds6
-    call mpegammaq (mp_egamma%mpr, mpnw)
+    if (mpwprecr (mpegammacon) < mpnw) then
+      write (mpldb, 1) mpnw
+1     format ('*** MP_EGAMMA: Egamma must be precomputed to precision',i9,' words'/ &
+      'by calling mpinit. See documentation for details.')
+      call mpabrt ( 706)
+    endif
+    call mpeq (mpegammacon, mp_egamma%mpr, mpnw)
   end function
 
   function mp_erf (ra)
@@ -3477,6 +3594,17 @@ contains
     return
   end function
 
+  function mp_expint (ra)
+    implicit none
+    type (mp_real):: mp_expint
+    type (mp_real), intent (in):: ra
+    integer mpnw
+    mpnw = min (int (ra%mpr(1)), mpwds)
+    mp_expint%mpr(0) = mpwds6
+    call mpexpint (ra%mpr, mp_expint%mpr, mpnw)
+    return
+  end function
+
   subroutine mp_fform (ra, nb, nd, b)
     implicit none
     type (mp_real), intent (in):: ra
@@ -3496,6 +3624,45 @@ contains
     mpnw = min (int (ra%mpr(1)), mpwds)
     mp_gamma%mpr(0) = mpwds6
     call mpgammar (ra%mpr, mp_gamma%mpr, mpnw)
+    return
+  end function
+
+  function mp_hurwitz_zetan (ia, rb)
+    implicit none
+    type (mp_real):: mp_hurwitz_zetan
+    integer, intent (in):: ia
+    type (mp_real), intent (in):: rb
+    integer mpnw
+    mpnw = min (int (rb%mpr(1)), mpwds)
+    mp_hurwitz_zetan%mpr(0) = mpwds6
+    call mphurwitzzetan (ia, rb%mpr, mp_hurwitz_zetan%mpr, mpnw)
+    return
+  end function
+
+  function mp_hurwitz_zetan_be (nb, rb, is, aa)
+    implicit none
+    type (mp_real):: mp_hurwitz_zetan_be
+    integer, intent (in):: nb, is
+    type (mp_real), intent (in):: rb(nb), aa
+    integer mpnw, n1
+    mpnw = min (int (aa%mpr(1)), mpwds)
+    mp_hurwitz_zetan_be%mpr(0) = mpwds6
+    n1 = mpwds
+    call mphurwitzzetanbe (n1, nb, rb(1)%mpr, is, aa%mpr, &
+      mp_hurwitz_zetan_be%mpr, mpnw)
+    return
+  end function
+
+  function mp_hypergeom_pfq (np, nq, aa, bb, xx)
+    implicit none
+    type (mp_real):: mp_hypergeom_pfq
+    integer, intent (in):: np, nq
+    type (mp_real), intent (in):: aa(np), bb(nq), xx
+    integer mpnw
+    mpnw = min (int (xx%mpr(1)), mpwds)
+    mp_hypergeom_pfq%mpr(0) = mpwds6
+    call mphypergeompfq (mpwds, np, nq, aa(1)%mpr(0), bb(1)%mpr(0), &
+      xx%mpr, mp_hypergeom_pfq%mpr, mpnw)
     return
   end function
 
@@ -3544,8 +3711,8 @@ contains
 !    integer, intent (in):: iprec
 !    mpnw = mp_setwp (iprec)
 !>>
-    call mpinifft (mpnw)
-    call mpinitran (mpnw)
+    if (mpnw > mpmlxm) call mpinifft (mpnw)
+    if (mpnw > mpl2pi) call mpinitran (mpnw)
     return
   end subroutine
 
@@ -3557,6 +3724,23 @@ contains
     mpnw = min (int (ra%mpr(1)), mpwds)
     mp_log%mpr(0) = mpwds6
     call mplog (ra%mpr, mp_log%mpr, mpnw)
+    return
+  end function
+
+  function mp_log10 (ra)
+    implicit none
+    type (mp_real):: mp_log10
+    type (mp_real), intent (in):: ra
+    type (mp_real) t1, t2
+    integer mpnw
+    mpnw = min (int (ra%mpr(1)), mpwds)
+    t1%mpr(0) = mpwds6
+    t2%mpr(0) = mpwds6
+    mp_log10%mpr(0) = mpwds6
+    call mpdmc (10.d0, 0, t1%mpr, mpnw)
+    call mplog (t1%mpr, t2%mpr, mpnw)
+    call mplog (ra%mpr, t1%mpr, mpnw)
+    call mpdiv (t1%mpr, t2%mpr, mp_log10%mpr, mpnw)
     return
   end function
 
@@ -3577,7 +3761,13 @@ contains
 !    mpnw = mp_setwp (iprec)
 !>>
     mp_log2%mpr(0) = mpwds6
-    call mplog2q (mp_log2%mpr, mpnw)
+    if (mpwprecr (mplog2con) < mpnw) then
+      write (mpldb, 1) mpnw
+1     format ('*** MP_LOG2: Log(2) must be precomputed to precision',i9,' words'/ &
+      'by calling mpinit. See documentation for details.')
+      call mpabrt ( 707)
+    endif
+    call mpeq (mplog2con, mp_log2%mpr, mpnw)
   end function
 
   function mp_max (ra, rb, rc)
@@ -3695,13 +3885,44 @@ contains
 !    mpnw = mp_setwp (iprec)
 !>>
     mp_pi%mpr(0) = mpwds6
-    call mppiq (mp_pi%mpr, mpnw)
+    if (mpwprecr (mppicon) < mpnw) then
+      write (mpldb, 1) mpnw
+1     format ('*** MP_PI: Pi must be precomputed to precision',i9,' words'/ &
+      'by calling mpinit. See documentation for details.')
+      call mpabrt ( 708)
+    endif
+    call mpeq (mppicon, mp_pi%mpr, mpnw)
+  end function
+
+  function mp_polygamma (nn, ra)
+    implicit none
+    integer, intent (in):: nn
+    type (mp_real), intent (in):: ra
+    type (mp_real) mp_polygamma
+    integer mpnw
+    mpnw = min (int (ra%mpr(1)), mpwds)
+    mp_polygamma%mpr(0) = mpwds6
+    call mppolygamma (nn, ra%mpr, mp_polygamma%mpr, mpnw)
+    return
+  end function
+
+  function mp_polygamma_be (nb, rb, nn, ra)
+    implicit none
+    integer, intent (in):: nb, nn
+    type (mp_real), intent (in):: ra, rb(nb)
+    type (mp_real) mp_polygamma_be
+    integer n1, mpnw
+    mpnw = min (int (ra%mpr(1)), mpwds)
+    mp_polygamma_be%mpr(0) = mpwds6
+    n1 = mpwds
+    call mppolygammabe (n1, nb, rb(1)%mpr, nn, ra%mpr, mp_polygamma_be%mpr, mpnw)
+    return
   end function
 
   subroutine mp_polylog_ini (nn, arr, iprec)
     implicit none
     integer, intent (in):: nn
-    type (mp_real), intent (out):: arr(nn)
+    type (mp_real), intent (out):: arr(abs(nn))
     integer i, mpnw, n1
 
 !>  In variant #1, uncomment these lines:
@@ -3728,7 +3949,7 @@ contains
   function mp_polylog_neg (nn, arr, ra)
     implicit none
     integer, intent (in):: nn
-    type (mp_real), intent (in):: arr(nn)
+    type (mp_real), intent (in):: arr(abs(nn))
     type (mp_real), intent (in):: ra
     type (mp_real) mp_polylog_neg
     integer mpnw, n1
@@ -4282,6 +4503,18 @@ contains
     return
   end function
 
+  function mp_struve_hn (nu, ra)
+    implicit none
+    integer, intent (in):: nu
+    type (mp_real):: mp_struve_hn
+    type (mp_real), intent (in):: ra
+    integer mpnw
+    mpnw = min (int (ra%mpr(1)), mpwds)
+    mp_struve_hn%mpr(0) = mpwds6
+    call mpstruvehn (nu, ra%mpr, mp_struve_hn%mpr, mpnw)
+    return
+  end function
+
   function mp_tan (ra)
     implicit none
     type (mp_real):: mp_tan
@@ -4293,10 +4526,10 @@ contains
     r2%mpr(0) = mpwds6
     mp_tan%mpr(0) = mpwds6
     call mpcssnr (ra%mpr, r1%mpr, r2%mpr, mpnw)
-    if (r1%mpr(2) == 0.d0) then
+    if (r1%mpr(2) == 0) then
       write (mpldb, 1)
 1     format ('*** MP_TAN: Cos of argument is zero.')
-      call mpabrt (26)
+      call mpabrt ( 709)
     endif
     call mpdiv (r2%mpr, r1%mpr, mp_tan%mpr, mpnw)
     return
@@ -4415,17 +4648,17 @@ contains
     return
   end function
 
-  function mp_zetaem (nb, rb, rc)
+  function mp_zeta_be (nb, rb, rc)
     implicit none
     integer, intent (in):: nb
-    type (mp_real):: mp_zetaem
+    type (mp_real):: mp_zeta_be
     type (mp_real), intent (in):: rb(nb), rc
     integer n1, mpnw
     mpnw = max (int (rb(1)%mpr(1)), int (rc%mpr(1)))
     mpnw = min (mpnw, mpwds)
-    mp_zetaem%mpr(0) = mpwds6
+    mp_zeta_be%mpr(0) = mpwds6
     n1 = mpwds
-    call mpzetaemr (n1, nb, rb(1)%mpr, rc%mpr, mp_zetaem%mpr, mpnw)
+    call mpzetabe (n1, nb, rb(1)%mpr, rc%mpr, mp_zeta_be%mpr, mpnw)
     return
   end function
 

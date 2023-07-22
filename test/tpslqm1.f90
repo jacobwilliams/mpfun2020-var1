@@ -2,7 +2,7 @@
 
 !  program tpslqm1
 
-!  Revision date:  15 Oct 2021
+!  Revision date:  12 Jan 2023
 
 !  AUTHOR:
 !   David H. Bailey
@@ -10,14 +10,14 @@
 !   Email: dhbailey@lbl.gov
 
 !  COPYRIGHT AND DISCLAIMER:
-!   All software in this package (c) 2021 David H. Bailey.
+!   All software in this package (c) 2023 David H. Bailey.
 !   By downloading or using this software you agree to the copyright, disclaimer
 !   and license agreement in the accompanying file DISCLAIMER.txt.
 
 !  DESCRIPTION:
 !   This program demonstrates pslqm1, which performs the one-level multipair
 !   PSLQ algorithm on an input vector.  A variety of sample input vectors can
-!   be generated as inputs to pslqm1, as given in the parameters below.  The
+!   be generated as inputs to pslqm1, as given in the parameters below. The
 !   pslqm1 routine is suitable for relations up to degree 25 or so; above this
 !   level pslqm2 or pslqm3 should be used for significantly better performance.
 !   For additional details, see:
@@ -32,16 +32,16 @@
 
 !   PSLQM1 parameters set below; all are default (4-byte) integer:
 !     idb   Debug level (0-4); default = 2.
-!     n     Integer relation vector length; default = 49.
+!     n     Integer relation vector length; default = 31.
 !           For minimal polynomial problems, n = 1 + polynomial degree.
-!     ndp   Full precision level in digits; default = 2500.
+!     ndp   Full precision level in digits; default = 250.
 !           ***Must be <= mpipl in module MPFUNF.
 !           ***Must be >= ndpm + precision level required to find relation.
-!     ndr   Log10 of the minimum dynamic range in y at detection; default = 30.
+!     ndr   Log10 of the minimum dynamic range in y at detection; default = 20.
 !           A detected relation is not deemed reliable unless this is exceeded.
-!     nep   Log10 of full precision epsilon for detections; default = 30 - ndp.
+!     nep   Log10 of full precision epsilon for detections; default = 20 - ndp.
 !           ***Must not be smaller than the accuracy of input x vector. In other
-!           words, if data is accurate to within 10^(-200), then nep > -200.
+!           words, if data is accurate say to within 10^(-200), then nep > -200.
 !     nrb   Log10 of maximum size (Euclidean norm) of acceptable relation;
 !           default = 200. Run will be aborted if this is exceeded.
 !     nwds  Full precision level in words; default = int (ndp/mpdpw + 2).
@@ -65,14 +65,12 @@ implicit none
 
 !  PSLQM1 parameters:
 
-integer kq, kr, ks, lcx
-parameter (kq = 0, kr = 5, ks = 6, lcx = 64)
+integer, parameter:: kq = 0, kr = 5, ks = 6, lcx = 64
 
 !  TPSLQM1 parameters:
 
-integer idb, n, ndp, ndr, nep, nrb, nwds
-parameter (idb = 2, n = kr * ks + 1, ndp = 250, ndr = 20, &
-  nep = 20 - ndp, nrb = 200, nwds = int (ndp / mpdpw + 2))
+integer, parameter:: idb = 2, n = kr * ks + 1, ndp = 250, ndr = 20, &
+  nep = 20 - ndp, nrb = 200, nwds = int (ndp / mpdpw + 2)
 
 integer i, i1, iq, j, j1
 real (mprknd) second, tm0, tm1
@@ -177,7 +175,7 @@ if (iq == 1) then
   i1 = i1 + 9
   
   do i = 1, n
-    if (r(i) .ne. 0.d0) then
+    if (r(i) /= 0.d0) then
       call mpfform (r(i), lcx, 0, chr1)
 
       do j = 1, lcx
@@ -213,12 +211,12 @@ else
 endif
 
 stop
-end
+end program tpslqm1
 
 !------------------------------
 
 !   The following code performs the one-level, multi-pair PSLQ algorithm.
-!   David H. Bailey     15 Oct 2021
+!   David H. Bailey   12 Jan 2023
 
 subroutine pslqm1 (idb, n, nwds, ndr, nrb, nep, x, iq, r)
 
@@ -243,17 +241,19 @@ subroutine pslqm1 (idb, n, nwds, ndr, nrb, nep, x, iq, r)
 !     ipm   int     Iteration  check interval for MP iterations; default = 10.
 !     itm   int     Maximum iteration count; default = 10^5. Run will be aborted
 !                   if this is exceeded.
-!     nsq   int     Size of tables used in iterdp and itermpw; default = 8.
+!     nsq   int     Size of tables used in iterdp and itermp; default = 8.
 
 use mpmodule
 implicit none
-integer i, idb, imq, ipi, ipm, iq, it, itm, izm, j, j1, n, ndr, nep, nrb, &
-  nwds, nsq, n1, n2, n3, n4
-parameter (ipi = 25, ipm = 100, itm = 100000, nsq = 8)
-real (mprknd) d1, d2, d3, d4, dplog10, second, tm0, tm1, times(2)
-type (mp_real) b(n,n), h(n,n), syq(n,nsq), r(n), x(n), &
-  y(n), bound, eps, rn, t1, t2, t3, t4
-external bound, dplog10, second
+integer, intent(in):: idb, n, nwds, ndr, nrb, nep
+type (mp_real), intent(in):: x(n)
+integer, intent(out):: iq
+type (mp_real), intent(out):: r(n)
+real (mprknd), external:: bounddp, second
+integer, parameter:: ipi = 25, ipm = 100, itm = 100000, nsq = 8
+integer i, imq, it, izm, j, j1, n1, n2, n3, n4
+real (mprknd) dh(n,n), d1, d2, d3, d4, rn, tm0, tm1, times(2)
+type (mp_real) eps, b(n,n), h(n,n), syq(n,nsq), y(n), t1, t2, t3, t4
 
 !   Initialize.
 
@@ -262,7 +262,7 @@ if (idb >= 2) write (6, 1) n
 iq = 0
 it = 0
 imq = 0
-rn = mpreal (0.d0, nwds)
+rn = 0.d0
 eps = mpreal (10.d0, nwds) ** nep
 
 do i = 1, 2
@@ -314,16 +314,16 @@ if (izm == 0) then
 5     format ('Iteration',i8,2x,'Min, max of y =',f11.6,'e',i6,f11.6,'e',i6)
     endif
 
-!   Compute norm bound.
+!   Compute norm bound using DP.
 
-    t1 = bound (n, nwds, h)
-    rn = max (rn, t1)
+    d1 = bounddp (n, h)
+    if (d1 == -1.d0) goto 120
+    rn = max (rn, d1)
+
     if (idb >= 2) then
-      call mpdecmd (t1, d1, n1)
-      call mpdecmd (rn, d2, n2)
-      write (6, 6) it, d1, n1, d2, n2
-6     format ('Iteration',i8,2x,'Norm bound =',f11.6,'e',i5,4x,'Max. bound =', &
-        f11.6,'e',i5)
+      write (6, 6) it, d1, rn
+6     format ('Iteration',i8,2x,'Norm bound =',1p,d15.6,4x,'Max. bound =', &
+      1p,d15.6)
     endif
 
 !   Check if iteration limit or norm bound limit is exceeded; if so, quit.
@@ -333,7 +333,7 @@ if (izm == 0) then
 7     format ('Iteration limit exceeded',i8)
       goto 120
     endif
-    if (dplog10 (rn) > nrb) then
+    if (log10 (rn) > nrb) then
       if (idb >= 1) write (6, 8) nrb
 8     format ('Norm bound limit exceeded.',i5)
       goto 120
@@ -354,8 +354,9 @@ tm0 = second ()
 t1 = mpreald (1.d300, nwds)
 t2 = mpreal (0.d0, nwds)
 t3 = mpreal (0.d0, nwds)
+t4 = mpreal (0.d0, nwds)
 
-!   Select the relation corresponding to the smallest y entry and compute norm.
+!   Select the relation corresponding to the smallest y entry.
 
 do j = 1, n
   if (abs (y(j)) < t1) then
@@ -365,35 +366,41 @@ do j = 1, n
   t2 = max (t2, abs (y(j)))
 enddo
 
+t3 = t1 / t2
+
 do i = 1, n
   r(i) = b(j1,i)
-  t3 = t3 + r(i) ** 2
+  t4 = t4 + r(i)**2
 enddo
 
-t3 = sqrt (t3)
-call mpdecmd (t3, d3, n3)
-d3 = d3 * 10.d0 ** n3
+!   Compute norm bound in DP.
+
+t4 = sqrt (t4)
+call mpdecmd (t4, d4, n4)
+d4 = d4 * 10.d0 ** n4
+d1 = bounddp (n, h)
+if (d1 == -1.d0) goto 120
+rn = max (rn, d1)
 
 !   Output the final norm bound and other info.
 
 if (idb >= 1) then
-  t4 = bound (n, nwds, h)
   call mpdecmd (t1, d1, n1)
   call mpdecmd (t2, d2, n2)
   call mpdecmd (t3, d3, n3)
-  call mpdecmd (t4, d4, n4)
-  write (6, 9) it, d1, n1, d2, n2, d4, n4
+  write (6, 9) it, d1, n1, d2, n2, d3, n3, rn
 9 format ('Iteration',i8,2x,'Relation detected'/ &
-  'Min, max of y =',0p,f11.6,'e',i5,f11.6,'e',i5/'Max. bound =',f11.6,'e',i5)
-  write (6, 10) j1, d3, n3, d1, n1
-10 format ('Index of relation =',i4,3x,'Norm =',f11.6,'e',i5,3x, &
-  'Residual =',f11.6,'e',i5)
+  'Min, max, ratio of y =',0p,f11.6,'e',i5,f11.6,'e',i5,f11.6,'e',i5/ &
+  'Max. bound =',1p,d15.6)
+  write (6, 10) j1, d4, d1, n1
+10 format ('Index of relation =',i4,3x,'Norm =',1p,d15.6,3x, &
+  'Residual =',0p,f11.6,'e',i5)
 endif
 
 !   If run was successful, set iq = 1.
 
-if (t1 == 0.d0) n1 = nep
-if (n3 <= nrb .and. n2 - n1 >= ndr) then
+if (d3 == 0.d0) n3 = nep
+if (n4 <= nrb .and. -n3 >= ndr) then
   iq = 1
 else
   if (idb >= 2) write (6, 11)
@@ -408,7 +415,7 @@ if (idb >= 2) write (6, 12) times
 12 format ('CPU times:'/(5f12.2))
 
 return
-end
+end subroutine pslqm1
 
 !------------------------------
 
@@ -422,9 +429,11 @@ subroutine minmax (n, nwds, y, y1, y2)
 
 use mpmodule
 implicit none
-integer i, n, nwds
+integer, intent(in):: n, nwds
+type (mp_real), intent(in):: y(n)
+type (mp_real), intent(out):: y1, y2
+integer i
 type (mp_real) t1, t2, t3
-type (mp_real) y(n), y1, y2
 
 t1 = mpreald (1.d300, nwds)
 t2 = mpreald (0.d0, nwds)
@@ -440,26 +449,27 @@ enddo
 y1 = t1
 y2 = t2
 return
-end
+end subroutine minmax
 
 subroutine initmp (idb, n, nsq, nwds, b, h, syq, x, y)
 
 !   This initializes MP arrays at the beginning.
 !   This is performed in full precision.
-!   Input: idb, n, nsq, nwds.
-!   Output: b, h, syq, x, y.
+!   Input: idb, n, nsq, nwds, x.
+!   Output: b, h, syq, y.
 
 use mpmodule
 implicit none
-integer i, idb, j, n, nsq, nwds
-integer ix(n)
-real (mprknd) dx(n)
-type (mp_real) b(n,n), h(n,n), s(n), syq(n,nsq), x(n), y(n), t1
+integer, intent(in):: idb, n, nsq, nwds
+type (mp_real), intent(in):: x(n)
+type (mp_real), intent(out):: b(n,n), h(n,n), syq(n,nsq), y(n)
+integer i, j
+type (mp_real) s(n), t1
 
 if (idb >= 3) then
   write (6, 1)
 1 format ('initmp: Input x vector:')
-  call matoutmd (1, n, ix, dx, x)
+  call matoutmd (1, n, x)
 endif
 
 !   Set b to the identity matrix.
@@ -515,32 +525,34 @@ enddo
 if (idb >= 3) then
   write (6, 2)
 2 format ('initmp: Initial y vector:')
-  call matoutmd (1, n, ix, dx, y)
+  call matoutmd (1, n, y)
   write (6, 3)
 3 format ('initmp: Initial h matrix:')
-  call matoutmd (n, n - 1, ix, dx, h)
+  call matoutmd (n, n - 1, h)
 endif
 
 return
-end
+end subroutine initmp
 
 subroutine itermp (idb, it, n, nsq, nwds, eps, b, h, syq, y, imq, izm)
 
 !   This performs one iteration of the PSLQM algorithm using MP arithmetic.
 !   This is performed in medium precision.
-!   Input: idb, it, n, nsq, nwds, eps, imq.
+!   Input: idb, it, n, nsq, nwds, eps, b, h, syq, y, imq.
 !   Output: b, h, syq, y, imq, izm.
 
 use mpmodule
 implicit none
-integer i, idb, ii, ij, im, im1, imq, it, izm, j, j1, j2, k, mpr, mq, n, &
-  n1, nsq, ntl, nwds
-parameter (ntl = 72)
+integer, intent(in):: idb, it, n, nsq, nwds
+type (mp_real), intent(in):: eps
+type (mp_real), intent(inout):: b(n,n), h(n,n), syq(n,nsq), y(n)
+integer, intent(inout):: imq
+integer, intent(out):: izm
+integer i, ii, ij, im, im1, j, j1, j2, k, mpr, mq, n1
+integer, parameter:: ntl = 72
 real (mprknd) d1
 integer ip(n), ir(n), is(n)
-real (mprknd) dx(n)
-type (mp_real) b(n,n), h(n,n), q(n), syq(n,nsq), t(n,n), y(n)
-type (mp_real) eps, gam, t1, t2, t3, t4, teps
+type (mp_real) q(n), t(n,n), gam, t1, t2, t3, t4, teps
 
 teps = 2.d0 ** ntl * eps
 izm = 0
@@ -579,7 +591,7 @@ do i = 1, mq
   endif
   j1 = ip(ii)
   j2 = j1 + 1
-  if (is(j1) .ne. 0 .or. is(j2) .ne. 0) goto 100
+  if (is(j1) /= 0 .or. is(j2) /= 0) goto 100
   ir(i) = j1
   is(j1) = 1
   is(j2) = 1
@@ -726,74 +738,146 @@ enddo
 if (idb >= 3) then
   write (6, 4)
 4 format ('itermp: Updated y:')
-!  call matoutmd (1, n, ip, dx, y)
+!  call matoutmd (1, n, y)
   call matoutmp (1, n, y)
   write (6, 5)
 5 format ('itermp: Updated b matrix:')
-  call matoutmd (n, n, ip, dx, b)
+  call matoutmd (n, n, b)
   write (6, 6)
 6 format ('itermp: Updated h matrix:')
-  call matoutmd (n, n - 1, ip, dx, h)
+  call matoutmd (n, n - 1, h)
 endif
 
 return
-end
+end subroutine itermp
 
 !------------------------------
 
 !   Second- and third-level subroutines.
 
-function bound (n, nwds, h)
+real (mprknd) function bounddp (n, h)
 
-!   This computes the norm bound using MP arithmetic.
+!   This computes the norm bound using DP arithmetic.
 
 use mpmodule
 implicit none
-integer i, n, nwds
-type (mp_real) bound,  h(n,n), t1
+integer, intent(in):: n
+type (mp_real), intent(in):: h(n,n)
+integer i, j
+real (mprknd) dh(n,n), t1
 
-t1 = mpreal (0.d0, nwds)
-
-do i = 1, n - 1
-  t1 = max (t1, abs (h(i,i)))
+do j = 1, n - 1
+  do i = 1, n
+    dh(i,j) = h(i,j)
+  enddo
 enddo
 
-bound = 1.d0 / t1
+call lqdp (n, n - 1, dh)
+t1 = 0.d0
+
+do i = 1, n - 1
+  t1 = max (t1, abs (dh(i,i)))
+enddo
+
+if (t1 < 1.d-300) then
+  write (6, 1)
+1 format ('bounddp: dh matrix too small -- use pslqm3 program instead.')
+  bounddp = -1.d0
+else
+  bounddp = 1.d0 / t1
+endif
 
 return
-end
+end function bounddp
 
-function dplog10 (a)
+subroutine lqdp (n, m, dh)
 
-!   For input MPM value a, this routine returns a DP approximation to log10 (a).
+!   This performs an LQ decomposition on the DP matrix dh.  It is a simplified
+!   and transposed adaptation of the subroutine dqrdc from Linpack.
+!   Input: n, m, dh.
+!   Output: dh.
 
 use mpmodule
 implicit none
-integer ia
-real (mprknd) da, dplog10
-type (mp_real) a
+integer, intent(in):: n, m
+real (mprknd), intent(inout):: dh(n,m)
+integer i, j, l, lup, ml
+real (mprknd) nrmxl, one, t, zero
 
-call mpdecmd (a, da, ia)
-if (da == 0.d0) then
-  dplog10 = -999999.d0
-else
-  dplog10 = log10 (abs (da)) + ia
-endif
+zero = 0.d0
+one = 1.d0
+lup = min (m,n)
 
-100 continue
+!   Perform the householder reduction of dh.
+
+do l = 1, lup
+  if (l == m) go to 280
+
+!   Compute the householder transformation for column l.
+
+  ml = m - l
+  t = zero
+
+  do i = 0, ml
+    t = t + dh(l,l+i) ** 2
+  enddo
+
+  nrmxl = sqrt (t)
+  if (nrmxl == zero) go to 270
+  if (dh(l,l) /= zero) nrmxl = sign (nrmxl, dh(l,l))
+  t = one / nrmxl
+
+  do i = 0, ml
+    dh(l,l+i) = t * dh(l,l+i)
+  enddo
+
+  dh(l,l) = one + dh(l,l)
+
+!   Apply the transformation to the remaining columns, updating the norms.
+
+  do j = l + 1, n
+    t = zero
+
+    do i = 0, ml
+      t = t + dh(l,l+i) * dh(j,l+i)
+    enddo
+
+    t = - t / dh(l,l)
+
+    do i = 0, ml
+      dh(j,l+i) = dh(j,l+i) + t * dh(l,l+i)
+    enddo
+  enddo
+
+!   Save the transformation.
+
+  dh(l,l) = - nrmxl
+270 continue
+280 continue
+enddo
+
+!   Zero dh above the diagonal.
+
+do j = 1, m
+  do i = 1, j - 1
+    dh(i,j) = 0.d0
+  enddo
+enddo
+
 return
-end
+end subroutine lqdp
 
-subroutine matoutmd (n1, n2, ix, dx, a)
+subroutine matoutmd (n1, n2, a)
 
 !   This outputs the MP matrix a as a DP matrix.
 
 use mpmodule
 implicit none
-integer i, j, n1, n2
+integer, intent(in):: n1, n2
+type (mp_real), intent(in):: a(n1,n2)
+integer i, j
 integer ix(n2)
 real (mprknd) dx(n2)
-type (mp_real) a(n1,n2)
 
 do i = 1, n1
   write (6, 1) i
@@ -808,7 +892,7 @@ do i = 1, n1
 enddo
 
 return
-end
+end subroutine matoutmd
 
 subroutine matoutmp (n1, n2, a)
 
@@ -817,8 +901,9 @@ subroutine matoutmp (n1, n2, a)
 
 use mpmodule
 implicit none
-integer i, j, n1, n2
-type (mp_real) a(n1,n2)
+integer, intent(in):: n1, n2
+type (mp_real), intent(in):: a(n1,n2)
+integer i, j
 
 do i = 1, n1
   write (6, 1) i
@@ -830,7 +915,7 @@ do i = 1, n1
 enddo
 
 return
-end
+end subroutine matoutmp
 
 subroutine qsortmp (n, a, ip)
 
@@ -842,9 +927,12 @@ subroutine qsortmp (n, a, ip)
 
 use mpmodule
 implicit none
-integer i, iq, it, j, jq, jz, k, l, n
-integer ip(n), ik(50), jk(50)
-type (mp_real) a(n), s0
+integer, intent(in):: n
+type (mp_real), intent(in):: a(n)
+integer, intent(out):: ip(n)
+integer i, iq, it, j, jq, jz, k, l
+integer ik(100), jk(100)
+type (mp_real) s0
 
 do i = 1, n
   ip(i) = i
@@ -933,4 +1021,4 @@ jk(k) = j
 if (k > 0) goto 130
 
 return
-end
+end subroutine qsortmp

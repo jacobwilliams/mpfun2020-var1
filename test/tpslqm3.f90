@@ -2,7 +2,7 @@
 
 !  program tpslqm3
 
-!  Revision date:  15 Oct 2021
+!  Revision date:  12 Jan 2023
 
 !  AUTHOR:
 !   David H. Bailey
@@ -10,23 +10,30 @@
 !   Email: dhbailey@lbl.gov
 
 !  COPYRIGHT AND DISCLAIMER:
-!   All software in this package (c) 2021 David H. Bailey.
+!   All software in this package (c) 2023 David H. Bailey.
 !   By downloading or using this software you agree to the copyright, disclaimer
 !   and license agreement in the accompanying file DISCLAIMER.txt.
 
 !  DESCRIPTION:
-!   This computes the Poisson phi function, as described in the paper 
-!   David H. Bailey, Jonathan M. Borwein, Jason Kimberley and Watson Ladd, "Computer
-!   discovery and analysis of large Poisson polynomials," Experimental Mathematics,
-!   27 Aug 2016, vol. 26, pg. 349-363, preprint available at
-!   https://www.davidhbailey.com/dhbpapers/poisson-res.pdf.
+!   This program demonstrates pslqm3, which performs the three-level multipair
+!   PSLQ algorithm on an input vector.  A variety of sample input vectors can
+!   be generated as inputs to pslqm3, as given in the parameters below.
+!   For additional details, see:
+
+!   David H. Bailey and David J. Broadhurst, "Parallel integer relation
+!   detection: Techniques and applications," Mathematics of Computation,
+!   vol. 70, no. 236 (Oct 2000), pg. 1719-1736, preprint available at
+!   http://www.davidhbailey.com/dhbpapers/ppslq.pdf.
+
+!   The pslqm2 routine is 100% THREAD SAFE -- all requisite parameters and
+!   arrays are passed through subroutine arguments.
 
 !   PSLQM3 parameters set below; all are default (4-byte) integer, except fname
 !     is character(64):
 !     idb   Debug level (0-4); default = 2.
-!     n     Integer relation vector length; default = 49.
+!     n     Integer relation vector length; default = 73.
 !           For minimal polynomial problems, n = 1 + polynomial degree.
-!     ndp   Full precision level in digits; default = 2500.
+!     ndp   Full precision level in digits; default = 1200.
 !           ***Must be <= mpipl in module MPFUNF.
 !           ***Must be >= ndpm + precision level required to find relation.
 !     ndpm  Medium precision level in digits; default = max (ndp/10, 100).
@@ -69,17 +76,14 @@ implicit none
 
 !  TPSLQM3 parameters:
 
-integer kq, kr, ks, lcx
-parameter (kq = 0, kr = 8, ks = 9, lcx = 64)
+integer, parameter:: kq = 0, kr = 8, ks = 9, lcx = 64
 
 !   PSLQM3 parameters:
 
-integer idb, n, ndp, ndpm, ndr, nep, nepm, nrb, nrs, nwds, nwdsm
-character(64) fname
-parameter (idb = 2, n = kr*ks + 1, ndp = 1100, ndpm = max (ndp / 10, 100), &
+integer, parameter:: idb = 2, n = kr*ks + 1, ndp = 1200, ndpm = max (ndp / 10, 100), &
   ndr = 30, nep = 30 - ndp, nepm = 20 - ndpm, nrb = 200, nrs = 0, &
-  nwds = int (ndp / mpdpw + 2), nwdsm = int (ndpm / mpdpw + 2), &
-  fname = 'pslqm3.rst')
+  nwds = int (ndp / mpdpw + 2), nwdsm = int (ndpm / mpdpw + 2)
+character(64), parameter:: fname= 'pslqm3.rst'
 
 real (mprknd) second, tm0, tm1
 integer i, i1, iq, j, j1, nn
@@ -110,9 +114,7 @@ write (6, 2) nn, kq, kr, ks, ndr, nrb, nrs, ndp, ndpm, nep, nepm
   'ndr =',i5,3x,'nrb =',i5,3x,'nrs =',i5/ &
   'Full precision level ndp =',i6,' Intermediate precision ndpm =',i6/ &
   'Full prec. epsilon level nep = ',i6,' Intermediate epsilon nepm =', i6)
-
-
-  
+ 
 if (kq == 1 .or. kq == 2 .or. kq == 3) then
   open (11, file = 'pslq.inp')
   rewind 11
@@ -195,7 +197,7 @@ if (iq == 1) then
   i1 = i1 + 9
   
   do i = 1, nn
-    if (r(i) .ne. 0.d0) then
+    if (r(i) /= 0.d0) then
       call mpfform (r(i), lcx, 0, chr1)
 
       do j = 1, lcx
@@ -231,12 +233,12 @@ else
 endif
 
 stop
-end
+end program tpslqm3
 
 !------------------------------
 
 !   The following code performs the three-level, multi-pair PSLQ algorithm.
-!   David H. Bailey    15 Oct 2021
+!   David H. Bailey   12 Jan 2023
 
 subroutine pslqm3 (idb, n, nwds, nwdsm, ndr, nrb, nrs, fname, nep, nepm, x, iq, r)
 
@@ -274,24 +276,27 @@ subroutine pslqm3 (idb, n, nwds, nwdsm, ndr, nrb, nrs, fname, nep, nepm, x, iq, 
 !                    formats in the subroutines below to "i9" or as needed.
 !     ndrm  int      Extra precision beyond wy dynamic range for MPM iterations;
 !                    default = 25.
-!     nsq   int      Size of tables used in iterdp and itermpw; default = 8.
+!     nsq   int      Size of tables used in iterdp and itermpm; default = 8.
 !     dreps double   Tolerance for DP dynamic range check; default = 1d-10.
 
 use mpmodule
 implicit none
-integer i, i1, idb, imq, ipi, ipm, iq, it, itm, its, izd, izm, izmm, j, j1, &
-  n, n1, n2, n3, n4, ndr, ndrm, nep, nepm, nrb, nrs, nsq, nwds, nwdsm, ndpm2, nwdsm2
-character(64) fname
-parameter (ipi = 500, ipm = 10, itm = 10000000, ndrm = 25, nsq = 8)
-real (mprknd) d1, d2, d3, d4, dreps, dplog10, second, &
+integer, intent(in):: idb, n, nwds, nwdsm, ndr, nrb, nrs, nep, nepm
+character (64), intent(in):: fname
+type (mp_real), intent(inout):: x(n)
+integer, intent(out):: iq
+type (mp_real), intent(out):: r(n)
+real (mprknd), external:: dplog10, second
+type (mp_realm), external:: bound, dynrange, dynrangem
+real (mprknd), parameter:: dreps = 1.d-10
+integer, parameter:: ipi = 500, ipm = 10, itm = 10000000, ndrm = 25, nsq = 8
+integer i, i1, imq, it, its, izd, izm, izmm, j, j1, &
+  n1, n2, n3, n4, n5, ndpm2, nwdsm2
+real (mprknd) da(n,n), db(n,n), dh(n,n), dsyq(n,nsq), dy(n), d1, d2, d3, d4, d5, &
   tm0, tm1, times(6)
-parameter (dreps = 1.d-10)
-real (mprknd) da(n,n), db(n,n), dh(n,n), dsa(n,n), dsb(n,n), &
-  dsh(n,n), dsyq(n,nsq), dy(n), dsy(n)
-type (mp_real) b(n,n), h(n,n), r(n), x(n), y(n), eps, t1, t2
-type (mp_realm) bound, dynrange, dynrangem, epsm, epsm2, wa(n,n), &
+type (mp_real) b(n,n), h(n,n), y(n), eps, t1, t2, t3, t4
+type (mp_realm) epsm, epsm2, wa(n,n), &
   wb(n,n), wh(n,n), wsyq(n,nsq), wy(n), wn, w1, w2
-external bound, dplog10, dynrange, dynrangem, second
 
 !   Initialize.
 
@@ -398,12 +403,13 @@ tm0 = second ()
 call initmpm (idb, n, nsq, nwdsm, wa, wb, wh, wy, wsyq, h, y)
 tm1 = second ()
 times(2) = times(2) + (tm1 - tm0)
+its = it
 
 110 continue
 
-!   Check if dynamic range of wy vector is too great for DP or QP iterations
-!   (which is often the case at the start of the run), or if the previous
-!   DP or QP iteration or was aborted. If so, then go perform MPM iterations.
+!   Check if dynamic range of the wy vector is too great for DP iterations (which
+!   is often the case at the start of the run), or if a very large value appeared
+!   in iterdp immediately after an MPM update. If so, then do MPM iterations.
 
 w1 = dynrangem (n, nwdsm, wy)
 if (idb >= 3) then
@@ -412,7 +418,7 @@ if (idb >= 3) then
 7 format ('Iteration',i8,2x,'Min/max ratio of wy =',f11.6,'e',i6)
 endif
 if (w1 < mprealdm (dreps, nwdsm) .or. izd == 2) then
-    goto 130
+  goto 130
 endif
 
 !+  Start of DP iteration section.
@@ -421,11 +427,6 @@ endif
 if (idb >= 3) write (6, 8) it
 8 format ('Iteration',i8,2x,'Start DP iterations')
 call initdp (idb, n, nsq, nwdsm, da, db, dh, dy, dsyq, wh, wy)
-
-!   Save DP arrays and iteration count.
-
-call savedp (n, da, db, dh, dy, dsa, dsb, dsh, dsy)
-its = it
 
 !   Perform an LQ decomposition on DH.
 
@@ -444,24 +445,16 @@ tm1 = second ()
 times(3) = times(3) + (tm1 - tm0)
 
 !   Test conditions on iterdp output flag izd:
-!   0: Iteration was uneventful; periodically save arrays and continue.
-!   1: Relation found or DP precision exhausted; perform MPM update.
-!   2: Very large value appeared in DA or DB; abort DP iter and do MPM update.
+!   0: Iteration was uneventful; continue with DP iterations.
+!   1: Relation found or DP precision exhausted; perform MPM update from DP arrays.
+!   2: Very large value appeared in iterdp; arrays were restored; perform a normal
+!      MPM update from DP arrays, as in the case izd = 1. But if this happens
+!      immediately after an MPM update, then start MPM iterations.
 
+if (izd == 2 .and. it > its + 1) izd = 1
 if (izd == 0) then
-  if (mod (it - its, ipm) == 0) then
-    call savedp (n, da, db, dh, dy, dsa, dsb, dsh, dsy)
-    its = it
-  endif
   goto 120
 else
-
-!   Check if DP iteration was aborted above; if so, then revert to previous data.
-
-  if (izd == 2) then
-    it = its
-    call savedp (n, dsa, dsb, dsh, dsy, da, db, dh, dy)
-  endif
 
 !   Update the MPM arrays from the DP arrays.
 
@@ -483,8 +476,8 @@ else
   elseif (izmm == 1 .or. izd == 2) then
 
 !   MPM update found relation, or exhausted MPM precision, or wy min/max ratio
-!   too small for DP iterations, or DP iteration produced a very large value.
-!   Update the MP arrays from the MPM arrays.
+!   too small for DP iterations, or DP iteration produced a very large value
+!   immediately after a MPM update. Update the MP arrays from the MPM arrays.
 
     if (idb >= 2) write (6, 11) it
 11  format ('Iteration',i8,2x,'MP update')
@@ -501,6 +494,12 @@ else
 
 !   Compute norm bound, using MPM precision.
 
+    do j = 1, n
+      do i = 1, n
+        wh(i,j) = mprealm (h(i,j), nwdsm)
+      enddo
+    enddo
+  
     w1 = bound (n, nwdsm, wh)
     call mpdecmd (w1, d3, n3)
     wn = max (wn, w1)
@@ -650,8 +649,10 @@ endif
 
 t1 = mpreald (1.d300, nwds)
 t2 = mpreald (0.d0, nwds)
+t3 = mpreald (0.d0, nwds)
+t4 = mpreald (0.d0, nwds)
 
-!   Select the relation corresponding to the smallest y entry and compute norm.
+!   Select the relation corresponding to the smallest y entry.
 
 do j = 1, n
   if (abs (y(j)) < t1) then
@@ -661,13 +662,14 @@ do j = 1, n
   t2 = max (t2, abs (y(j)))
 enddo
 
+t3 = t1 / t2
+
 do i = 1, n
   r(i) = b(j1,i)
 enddo
 
 !   The norm and norm bound calculation here are performed in medium precision.
 
-tm0 = second ()
 w1 = mprealdm (0.d0, nwdsm)
 
 do i = 1, n
@@ -684,28 +686,28 @@ enddo
   
 w2 = bound (n, nwdsm, wh)
 wn = max (wn, w2)
-tm1 = second ()
-times(3) = times(3) + (tm1 - tm0)
 
 !   Output the final norm bound and other information.
 
 if (idb >= 1) then
   call mpdecmd (t1, d1, n1)
   call mpdecmd (t2, d2, n2)
-  call mpdecmd (w1, d3, n3)
-  call mpdecmd (wn, d4, n4)
-  write (6, 20) it, d1, n1, d2, n2, d4, n4
+  call mpdecmd (t3, d3, n3)
+  call mpdecmd (w1, d4, n4)
+  call mpdecmd (wn, d5, n5)
+  write (6, 20) it, d1, n1, d2, n2, d3, n3, d5, n5
 20 format ('Iteration',i8,2x,'Relation detected'/ &
-  'Min, max of y =',f11.6,'e',i6,f11.6,'e',i6/'Max. bound =',f11.6,'e',i6)
-  write (6, 21) j1, d3, n3, d1, n1
-21 format ('Index of relation =',i4,3x,'Norm =',f11.5,'e',i5,3x, &
-  'Residual =',f11.6,'e',i6)
+  'Min, max, ratio of y =',0p,f11.6,'e',i6,f11.6,'e',i6,f11.6,'e',i6/ &
+  'Max. bound =',f11.6,'e',i5)
+  write (6, 21) j1, d4, n4, d1, n1
+21 format ('Index of relation =',i4,3x,'Norm =',0p,f11.6,'e',i5,3x, &
+  'Residual =',0p,f11.6,'e',i6)
 endif
 
 !   If run was successful, set iq = 1; otherwise output message.
 
-if (t1 == 0.d0) n1 = nep
-if (n3 <= nrb .and. n2 - n1 >= ndr) then
+if (d3 == 0.d0) n3 = -nep
+if (n4 <= nrb .and. -n3 >= ndr) then
   iq = 1
 else
   if (idb >= 2) write (6, 22)
@@ -722,7 +724,7 @@ if (idb >= 2) write (6, 23) times, sum (times)
 23 format ('CPU run times:'/(7f12.2))
 
 return
-end
+end subroutine pslqm3
 
 
 !------------------------------
@@ -735,9 +737,9 @@ subroutine saverest (iu, n, it, izm, izmm, izd, times, x, y, b, h)
 
 use mpmodule
 implicit none
-integer iu, n, it, izm, izmm, izd
-real (mprknd) times(6)
-type (mp_real) b(n,n), h(n,n), x(n), y(n)
+integer, intent(in):: iu, n, it, izm, izmm, izd
+real (mprknd), intent(in):: times(6)
+type (mp_real), intent(in):: b(n,n), h(n,n), x(n), y(n)
 
 rewind (iu)
 write (iu) it, izm, izmm, izd
@@ -750,7 +752,7 @@ flush (iu)
 rewind (iu)
 
 return
-end
+end subroutine saverest
 
 subroutine setprec (nwdsm, n, nsq, wa, wb, wh, wsyq, wy)
 
@@ -759,8 +761,9 @@ subroutine setprec (nwdsm, n, nsq, wa, wb, wh, wsyq, wy)
 
 use mpmodule
 implicit none
-integer i, j, n, nsq, nwdsm
-type (mp_realm) wa(n,n), wb(n,n), wh(n,n), wsyq(n,nsq), wy(n)
+integer, intent(in):: nwdsm, n, nsq
+type (mp_realm), intent(inout):: wa(n,n), wb(n,n), wh(n,n), wsyq(n,nsq), wy(n)
+integer i, j
 
 do j = 1, n
   do i = 1, n
@@ -781,18 +784,19 @@ do i = 1, n
 enddo
 
 return
-end
+end subroutine setprec
 
-function dynrange (n, nwdsm, y)
+type (mp_realm) function dynrange (n, nwdsm, y)
 
 !   This returns the dynamic range of y, i.e., ratio of min|y_k| to max|y_k|,
 !   normally done using MPM precision. Here y is of type mp_real.
 
 use mpmodule
 implicit none
-integer i, n, nwdsm
-type (mp_realm) dynrange, t1, t2, t3
-type (mp_real) y(n)
+integer, intent(in):: n, nwdsm
+type (mp_real), intent(in):: y(n)
+integer i
+type (mp_realm) t1, t2, t3
 
 t1 = mprealdm (1.d300, nwdsm)
 t2 = mprealdm (0.d0, nwdsm)
@@ -807,17 +811,19 @@ enddo
 
 dynrange = t1 / t2
 return
-end
+end function dynrange
 
-function dynrangem (n, nwdsm, wy)
+type (mp_realm) function dynrangem (n, nwdsm, wy)
 
 !   This returns the dynamic range of wy, i.e., ratio of min|wy_k| to max|wy_k|,
 !   normally done using MPM precision. Here wy is of type mp_realm.
 
 use mpmodule
 implicit none
-integer i, n, nwdsm
-type (mp_realm) dynrangem, t1, t2, t3, wy(n) 
+integer, intent(in):: n, nwdsm
+type (mp_realm), intent(in):: wy(n)
+integer i
+type (mp_realm) t1, t2, t3 
 
 t1 = mprealdm (1.d300, nwdsm)
 t2 = mprealdm (0.d0, nwdsm)
@@ -832,7 +838,7 @@ enddo
 
 dynrangem = t1 / t2
 return
-end
+end function dynrangem
 
 subroutine initdp (idb, n, nsq, nwdsm, da, db, dh, dy, dsyq, wh, wy)
 
@@ -843,9 +849,11 @@ subroutine initdp (idb, n, nsq, nwdsm, da, db, dh, dy, dsyq, wh, wy)
 
 use mpmodule
 implicit none
-integer i, idb, j, n, nsq, nwdsm
-real (mprknd) da(n,n), db(n,n), dh(n,n), dy(n), dsyq(n,nsq)
-type (mp_realm) wh(n,n), wy(n), t1, t2
+integer, intent(in):: idb, n, nsq, nwdsm
+real (mprknd), intent(out):: da(n,n), db(n,n), dh(n,n), dy(n), dsyq(n,nsq)
+type (mp_realm), intent(in):: wh(n,n), wy(n)
+integer i, j
+type (mp_realm) t1, t2
 
 t2 = mprealdm (0.d0, nwdsm)
 
@@ -911,7 +919,7 @@ if (idb >= 4) then
 endif
 
 return
-end
+end subroutine initdp
 
 subroutine initmp (idb, n, nwds, b, h, x, y)
 
@@ -922,15 +930,15 @@ subroutine initmp (idb, n, nwds, b, h, x, y)
 
 use mpmodule
 implicit none
-integer i, idb, j, n, nwds
-integer ix(n)
-real (mprknd) dx(n)
-type (mp_real) b(n,n), h(n,n), s(n), x(n), y(n), t1
+integer, intent(in):: idb, n, nwds
+type (mp_real), intent(out):: b(n,n), h(n,n), x(n), y(n)
+integer i, j
+type (mp_real) s(n), t1
 
 if (idb >= 4) then
   write (6, 1)
 1 format ('initmp: Input x vector:')
-  call matoutmd (1, n, ix, dx, x)
+  call matoutmd (1, n, x)
 endif
 
 !   Set b to the identity matrix.
@@ -982,14 +990,14 @@ enddo
 if (idb >= 4) then
   write (6, 2)
 2 format ('initmp: Initial y vector:')
-  call matoutmd (1, n, ix, dx, y)
+  call matoutmd (1, n, y)
   write (6, 3)
 3 format ('initmp: Initial h matrix:')
-  call matoutmd (n, n - 1, ix, dx, h)
+  call matoutmd (n, n - 1, h)
 endif
 
 return
-end
+end subroutine initmp
 
 subroutine initmpm (idb, n, nsq, nwdsm, wa, wb, wh, wy, wsyq, h, y)
 
@@ -1000,11 +1008,11 @@ subroutine initmpm (idb, n, nsq, nwdsm, wa, wb, wh, wy, wsyq, h, y)
 
 use mpmodule
 implicit none
-integer i, idb, j, n, nsq, nwdsm
-integer ix(n)
-real (mprknd) dx(n)
-type (mp_realm) wa(n,n), wb(n,n), wh(n,n), wy(n), wsyq(n,nsq), t1, t2, t3
-type (mp_real) h(n,n), y(n)
+integer, intent(in):: idb, n, nsq, nwdsm
+type (mp_real), intent(in):: h(n,n), y(n)
+type (mp_realm), intent(out):: wa(n,n), wb(n,n), wh(n,n), wy(n), wsyq(n,nsq)
+integer i, j
+type (mp_realm) t1, t2, t3
 
 t2 = mprealdm (0.d0, nwdsm)
 
@@ -1054,39 +1062,46 @@ enddo
 if (idb >= 4) then
   write (6, 3)
 3 format ('initmpm: wy vector:')
-  call matoutmmd (1, n, ix, dx, wy)
+  call matoutmmd (1, n, wy)
   write (6, 4)
 4 format ('initmpm: Factored wh matrix:')
-  call matoutmmd (n, n - 1, ix, dx, wh)
+  call matoutmmd (n, n - 1, wh)
 endif
 
 100 continue
 
 return
-end
+end subroutine initmpm
 
 subroutine iterdp (idb, it, n, nsq, da, db, dh, dsyq, dy, imq, izd)
 
 
 !   This performs one iteration of the PSLQ algorithm using DP arithmetic.
-!   Input: idb, it, n, nsq, da, db, dh, dsyq, dy.
+!   Input: idb, it, n, nsq, da, db, dh, dsyq, dy, imq.
 !   Output: da, db, dh, dsyq, dy, imq, izd.
 
 !   NOTE: Parameter tmx2 = 2^52, not 2^53, so as to ensure that values > 2^53
 !   never arise, even as intermediate values, in the update loop below.
+!   Gam = sqrt (4/3) = 1.15470053837925153d0 by default.
 
 use mpmodule
 implicit none
-integer i, idb, ii, ij, im, im1, imq, it, izd, j, j1, j2, k, mpr, mq, n, nsq
-real (mprknd) deps, gam, t1, t2, t3, t4, tmx1, tmx2
+integer, intent(in):: idb, it, n, nsq
+real (mprknd), intent(inout):: da(n,n), db(n,n), dh(n,n), dsyq(n,nsq), dy(n)
+integer, intent(inout):: imq
+integer, intent(out):: izd
+real (mprknd), parameter:: tmx1 = 1.d13, tmx2 = 2.d0**52, deps = 1.d-14, &
+  gam = 1.15470053837925153d0
+integer i, ii, ij, im, im1, j, j1, j2, k, mpr, mq
 integer ip(n), ir(n), is(n)
-real (mprknd) da(n,n), db(n,n), dh(n,n), dq(n), dsyq(n,nsq), &
-  dt(n,n), dy(n)
-parameter (tmx1 = 1.d13, tmx2 = 2.d0**52, deps = 1.d-14)
+real (mprknd) dq(n), dt(n,n), dsa(n,n), dsb(n,n), dsh(n,n), dsy(n), &
+  t1, t2, t3, t4
 
+!   Save the input DP arrays in case the iteration is aborted below.
+
+call  savedp (n, da, db, dh, dy, dsa, dsb, dsh, dsy)
 izd = 0
 mpr = nint (0.4d0 * n)
-gam = sqrt (4.d0 / 3.d0)
 
 !   Compute dq vector = {gam^i * |dh(i,i)|}, then sort in ascending order.
 
@@ -1122,7 +1137,7 @@ do i = 1, mq
   endif
   j1 = ip(ii)
   j2 = j1 + 1
-  if (is(j1) .ne. 0 .or. is(j2) .ne. 0) goto 100
+  if (is(j1) /= 0 .or. is(j2) /= 0) goto 100
   ir(i) = j1
   is(j1) = 1
   is(j2) = 1
@@ -1226,18 +1241,29 @@ do k = 1, n
 enddo
 
 if (t1 <= deps) then
+
+!  A small value appeared in dy; set izd = 1.
+
   if (idb >= 3) write (6, 1) it, t1
 1 format ('Iteration',i8,2x,'iterdp: Small value in dy =',1pd15.6)
   izd = 1
 endif
 
 if (t2 > tmx1 .and. t2 <= tmx2) then
+
+!  A large (but not very large) value appeared in da or db; set izd = 1.
+
   if (idb >= 3) write (6, 2) it, t2
 2 format ('Iteration',i8,2x,'iterdp: Large value in da or db =',1pd15.6)
   izd = 1
 elseif (t2 > tmx2) then
+
+!   A very large value appeared in da or db; restore original arrays, set izd = 2
+!   and return.
+
   if (idb >= 2) write (6, 3) it, t2
 3 format ('Iteration',i8,2x,'iterdp: Very large value in da or db =',1pd15.6)
+  call savedp (n, dsa, dsb, dsh, dsy, da, db, dh, dy)
   izd = 2
   return
 endif
@@ -1285,24 +1311,24 @@ if (idb >= 4) then
 endif
 
 return
-end
+end subroutine iterdp
 
 subroutine itermpm (idb, it, n, nsq, nwdsm, epsm, wa, wb, wh, wsyq, wy, imq, izmm)
 
 !   This performs one iteration of the PSLQM algorithm using MPM arithmetic.
 !   This is performed in medium precision.
-!   Input: idb, it, n, nsq, nwdsm, epsm, imq.
+!   Input: idb, it, n, nsq, nwdsm, wa, wb, wh, wsyq, wy, epsm, imq.
 !   Output: wa, wb, wh, wsyq, wy, imq, izmm.
 
 use mpmodule
 implicit none
-integer i, idb, ii, ij, im, im1, imq, it, izmm, j, j1, j2, k, mpr, mq, n, n1, &
-  nsq, nwdsm
+integer, intent(in):: idb, it, n, nsq, nwdsm
+type (mp_realm), intent(inout):: wa(n,n), wb(n,n), wh(n,n), wsyq(n,nsq), wy(n)
+integer, intent(inout):: imq
+integer, intent(out):: izmm
+integer i, ii, ij, im, im1, j, j1, j2, k, mpr, mq, n1, ip(n), ir(n), is(n)
 real (mprknd) d1
-type (mp_realm) gam, t1, t2, t3, t4, epsm, tmx1, tmx2
-integer ip(n), ir(n), is(n)
-real (mprknd) dx(n)
-type (mp_realm) wa(n,n), wb(n,n), wh(n,n), wq(n), wsyq(n,nsq), wt(n,n), wy(n)
+type (mp_realm) gam, t1, t2, t3, t4, epsm, tmx1, tmx2, wq(n), wt(n,n)
 
 tmx1 = 1.d0 / mprealm (epsm, nwdsm) / mprealdm (1d20, nwdsm)
 tmx2 = mprealdm (2.d0, nwdsm) ** (nwdsm * mpnbt)
@@ -1342,7 +1368,7 @@ do i = 1, mq
   endif
   j1 = ip(ii)
   j2 = j1 + 1
-  if (is(j1) .ne. 0 .or. is(j2) .ne. 0) goto 100
+  if (is(j1) /= 0 .or. is(j2) /= 0) goto 100
   ir(i) = j1
   is(j1) = 1
   is(j2) = 1
@@ -1503,22 +1529,22 @@ enddo
 if (idb >= 4) then
   write (6, 5)
 5 format ('itermpm: Updated wy:')
-  call matoutmmd (1, n, ip, dx, wy)
+  call matoutmmd (1, n, wy)
   write (6, 6)
 6 format ('itermpm: Updated wa matrix:')
-  call matoutmmd (n, n, ip, dx, wa)
+  call matoutmmd (n, n, wa)
   write (6, 7)
 7 format ('itermpm: Updated wb matrix:')
-  call matoutmmd (n, n, ip, dx, wb)
+  call matoutmmd (n, n, wb)
   write (6, 8)
 8 format ('itermpm: Updated wh matrix:')
-  call matoutmmd (n, n - 1, ip, dx, wh)
+  call matoutmmd (n, n - 1, wh)
 endif
 
 200 continue
 
 return
-end
+end subroutine itermpm
 
 subroutine lqdp (n, m, dh)
 
@@ -1529,8 +1555,10 @@ subroutine lqdp (n, m, dh)
 
 use mpmodule
 implicit none
-integer i, j, l, lup, m, ml, n
-real (mprknd) dh(n,m), nrmxl, one, t, zero
+integer, intent(in):: n, m
+real (mprknd), intent(inout):: dh(n,m)
+integer i, j, l, lup, ml
+real (mprknd) nrmxl, one, t, zero
 
 zero = 0.d0
 one = 1.d0
@@ -1552,7 +1580,7 @@ do l = 1, lup
 
   nrmxl = sqrt (t)
   if (nrmxl == zero) go to 270
-  if (dh(l,l) .ne. zero) nrmxl = sign (nrmxl, dh(l,l))
+  if (dh(l,l) /= zero) nrmxl = sign (nrmxl, dh(l,l))
   t = one / nrmxl
 
   do i = 0, ml
@@ -1593,7 +1621,7 @@ do j = 1, m
 enddo
 
 return
-end
+end subroutine lqdp
 
 subroutine lqmpm (n, m, nwdsm, h)
 
@@ -1605,8 +1633,10 @@ subroutine lqmpm (n, m, nwdsm, h)
 
 use mpmodule
 implicit none
-integer i, j, l, lup, m, ml, n, nwdsm
-type (mp_realm) h(n,m), nrmxl, one, t, zero
+integer, intent(in):: n, m, nwdsm
+type (mp_realm), intent(inout):: h(n,m)
+integer i, j, l, lup, ml
+type (mp_realm) nrmxl, one, t, zero
 
 zero = mprealdm (0.d0, nwdsm)
 one = mprealdm (1.d0, nwdsm)
@@ -1628,7 +1658,7 @@ do l = 1, lup
 
   nrmxl = sqrt (t)
   if (nrmxl == zero) go to 270
-  if (h(l,l) .ne. zero) nrmxl = sign (nrmxl, h(l,l))
+  if (h(l,l) /= zero) nrmxl = sign (nrmxl, h(l,l))
   t = one / nrmxl
 
   do i = 0, ml
@@ -1669,7 +1699,7 @@ do j = 1, m
 enddo
 
 return
-end
+end subroutine lqmpm
 
 subroutine savedp (n, da, db, dh, dy, dsa, dsb, dsh, dsy)
 
@@ -1681,9 +1711,10 @@ subroutine savedp (n, da, db, dh, dy, dsa, dsb, dsh, dsy)
 
 use mpmodule
 implicit none
-integer i, j, n
-real (mprknd) da(n,n), db(n,n), dh(n,n), dy(n), dsa(n,n), dsb(n,n), &
-  dsh(n,n), dsy(n)
+integer, intent(in):: n
+real (mprknd), intent(in):: da(n,n), db(n,n), dh(n,n), dy(n)
+real (mprknd), intent(out):: dsa(n,n), dsb(n,n), dsh(n,n), dsy(n)
+integer i, j
 
 do i = 1, n
   dsy(i) = dy(i)
@@ -1698,7 +1729,7 @@ do j = 1, n
 enddo
 
 return
-end
+end subroutine savedp
 
 subroutine updtmp (idb, it, n, nwds, wa, wb, eps, b, h, y, izm)
 
@@ -1708,14 +1739,15 @@ subroutine updtmp (idb, it, n, nwds, wa, wb, eps, b, h, y, izm)
 !   Output: b, h, y, izm.
 
 use mpmodule
-implicit none 
-integer i, i1, idb, it, izm, n, n1, n2, nwds
+implicit none
+integer, intent(in):: idb, it, n, nwds
+type (mp_realm), intent(in):: wa(n,n), wb(n,n)
+type (mp_real), intent(in):: eps
+type (mp_real), intent(inout):: b(n,n), h(n,n), y(n)
+integer, intent(out):: izm
+integer i, i1, n1, n2
 real (mprknd) d1, d2
-type (mp_real) eps, t1, t2
-integer ix(n)
-real (mprknd) dx(n)
-type (mp_realm) wa(n,n), wb(n,n)
-type (mp_real) b(n,n), h(n,n), y(n)
+type (mp_real) t1, t2
 
 izm = 0
 
@@ -1777,17 +1809,17 @@ endif
 if (idb >= 4) then
   write (6, 4)
 4 format ('updtmp: Updated y:')
-  call matoutmd (1, n, ix, dx, y)
+  call matoutmd (1, n, y)
   write (6, 5)
 5 format ('updtmp: Updated b matrix:')
-  call matoutmd (n, n, ix, dx, b)
+  call matoutmd (n, n, b)
   write (6, 6)
 6 format ('updtmp: Updated h matrix:')
-  call matoutmd (n, n - 1, ix, dx, h)
+  call matoutmd (n, n - 1, h)
 endif
 
 return
-end
+end subroutine updtmp
 
 subroutine updtmpm (idb, it, n, nwdsm, epsm, da, db, dreps, wa, wb, wh, wy, izmm)
 
@@ -1797,13 +1829,14 @@ subroutine updtmpm (idb, it, n, nwdsm, epsm, da, db, dreps, wa, wb, wh, wy, izmm
 !   Output: wa, wb, wh, wy, izmm.
 
 use mpmodule
-implicit none 
-integer i, idb, it, izmm, j, n, n1, n2, nwdsm
+implicit none
+integer, intent(in):: idb, it, n, nwdsm
+real (mprknd) da(n,n), db(n,n), dreps
+type (mp_realm), intent(inout):: wa(n,n), wb(n,n), wh(n,n), wy(n)
+integer, intent(out):: izmm
+integer i, j, n1, n2
 real (mprknd) d1, d2
-type (mp_realm) t1, t2, epsm, tmx1, tmx2
-integer ix(n)
-real (mprknd) da(n,n), db(n,n), dx(n), dreps
-type (mp_realm) wa(n,n), wb(n,n), wh(n,n), wy(n), w1
+type (mp_realm) t1, t2, epsm, tmx1, tmx2, w1
 
 tmx1 = 1.d0 / epsm
 tmx2 = mprealdm (2.d0, nwdsm) ** (nwdsm * mpnbt)
@@ -1891,35 +1924,37 @@ call mxmdm (n, n - 1, nwdsm, da, wh)
 if (idb >= 4) then
   write (6, 5)
 5 format ('updtmpm: Updated wy:')
-  call matoutmmd (1, n, ix, dx, wy)
+  call matoutmmd (1, n, wy)
   write (6, 6)
 6 format ('updtmpm: Updated wa matrix:')
-  call matoutmmd (n, n, ix, dx, wa)
+  call matoutmmd (n, n, wa)
   write (6, 7)
 7 format ('updtmpm: Updated wb matrix:')
-  call matoutmmd (n, n, ix, dx, wb)
+  call matoutmmd (n, n, wb)
   write (6, 8)
 8 format ('updtmpm: Updated wh matrix:')
-  call matoutmmd (n, n - 1, ix, dx, wh)
+  call matoutmmd (n, n - 1, wh)
 endif
 
 100 continue
 
 return
-end
+end subroutine updtmpm
 
 !------------------------------
 
 !   Second- and third-level subroutines.
 
-function bound (n, nwdsm, wh)
+type (mp_realm) function bound (n, nwdsm, wh)
 
 !   This computes the norm bound, normally done using MPM arithmetic.
 
 use mpmodule
 implicit none
-integer i, n, nwdsm
-type (mp_realm) wh(n,n), bound, t1
+integer, intent(in):: n, nwdsm
+type (mp_realm), intent(inout):: wh(n,n)
+integer i
+type (mp_realm) t1
 
 call lqmpm (n, n - 1, nwdsm, wh)
 t1 = mprealdm (0.d0, nwdsm)
@@ -1930,17 +1965,17 @@ enddo
 
 bound = 1.d0 / t1
 return
-end
+end function bound
 
-function dplog10 (a)
+real (mprknd) function dplog10 (a)
 
 !   For input MPM value a, this routine returns a DP approximation to log10 (a).
 
 use mpmodule
 implicit none
+type (mp_realm), intent(in):: a
 integer ia
-real (mprknd) da, dplog10
-type (mp_realm) a
+real (mprknd) da
 
 call mpdecmd (a, da, ia)
 if (da == 0.d0) then
@@ -1951,7 +1986,7 @@ endif
 
 100 continue
 return
-end
+end function dplog10
 
 subroutine matoutdp (n1, n2, a)
 
@@ -1959,8 +1994,9 @@ subroutine matoutdp (n1, n2, a)
 
 use mpmodule
 implicit none
-integer i, j, n1, n2
-real (mprknd) a(n1,n2)
+integer, intent(in):: n1, n2
+real (mprknd), intent(in):: a(n1,n2)
+integer i, j
 
 do i = 1, n1
   write (6, 1) i
@@ -1970,18 +2006,18 @@ do i = 1, n1
 enddo
 
 return
-end
+end subroutine matoutdp
 
-subroutine matoutmd (n1, n2, ix, dx, a)
+subroutine matoutmd (n1, n2, a)
 
 !   This outputs the MP matrix a as a DP matrix.
 
 use mpmodule
 implicit none
-integer i, j, n1, n2
-integer ix(n2)
+integer, intent(in):: n1, n2
+type (mp_real), intent(in):: a(n1,n2)
+integer i, j, ix(n2)
 real (mprknd) dx(n2)
-type (mp_real) a(n1,n2)
 
 do i = 1, n1
   write (6, 1) i
@@ -1996,18 +2032,18 @@ do i = 1, n1
 enddo
 
 return
-end
+end subroutine matoutmd
 
-subroutine matoutmmd (n1, n2, ix, dx, a)
+subroutine matoutmmd (n1, n2, a)
 
 !   This outputs the MPM matrix a as a DP matrix.
 
 use mpmodule
 implicit none
-integer i, j, n1, n2
-integer ix(n2)
+integer, intent(in):: n1, n2
+type (mp_realm), intent(in):: a(n1,n2)
+integer i, j, ix(n2)
 real (mprknd) dx(n2)
-type (mp_realm) a(n1,n2)
 
 do i = 1, n1
   write (6, 1) i
@@ -2022,7 +2058,7 @@ do i = 1, n1
 enddo
 
 return
-end
+end subroutine matoutmmd
 
 subroutine matoutmp (n1, n2, a)
 
@@ -2031,8 +2067,9 @@ subroutine matoutmp (n1, n2, a)
 
 use mpmodule
 implicit none
-integer i, j, n1, n2
-type (mp_real) a(n1,n2)
+integer, intent(in):: n1, n2
+type (mp_real), intent(in):: a(n1,n2)
+integer i, j
 
 do i = 1, n1
   write (6, 1) i
@@ -2044,7 +2081,7 @@ do i = 1, n1
 enddo
 
 return
-end
+end subroutine matoutmp
 
 subroutine mxmdm (n1, n2, nwdsm, a, b)
 
@@ -2056,9 +2093,11 @@ subroutine mxmdm (n1, n2, nwdsm, a, b)
 
 use mpmodule
 implicit none
-integer i, j, k, n1, n2, nwdsm
-real (mprknd) a(n1,n1)
-type (mp_realm) b(n1,n2), c(n1,n2)
+integer, intent(in):: n1, n2, nwdsm
+real (mprknd), intent(in):: a(n1,n1)
+type (mp_realm), intent(inout):: b(n1,n2)
+integer i, j, k
+type (mp_realm) c(n1,n2)
 
 do j = 1, n2
   do i = 1, n1
@@ -2077,7 +2116,7 @@ do j = 1, n2
 enddo
 
 return
-end
+end subroutine mxmdm
 
 subroutine mxm (n1, n2, nwds, a, b)
 
@@ -2089,9 +2128,11 @@ subroutine mxm (n1, n2, nwds, a, b)
 
 use mpmodule
 implicit none
-integer i, j, k, n1, n2, nwds
-type (mp_realm) a(n1,n1)
-type (mp_real) b(n1,n2), c(n1,n2)
+integer, intent(in):: n1, n2, nwds
+type (mp_realm), intent(in):: a(n1,n1)
+type (mp_real), intent(inout):: b(n1,n2)
+integer i, j, k
+type (mp_real) c(n1,n2)
 
 do j = 1, n2
   do i = 1, n1
@@ -2110,7 +2151,7 @@ do j = 1, n2
 enddo
 
 return
-end
+end subroutine mxm
 
 subroutine qsortdp (n, a, ip)
 
@@ -2122,9 +2163,12 @@ subroutine qsortdp (n, a, ip)
 
 use mpmodule
 implicit none
-integer i, iq, it, j, jq, jz, k, l, n
-real (mprknd) a(n), s0
-integer ip(n), ik(50), jk(50)
+integer, intent(in):: n
+real (mprknd), intent(in):: a(n)
+integer, intent(out):: ip(n)
+integer i, iq, it, j, jq, jz, k, l
+real (mprknd) s0
+integer ik(100), jk(100)
 
 do i = 1, n
   ip(i) = i
@@ -2211,7 +2255,7 @@ jk(k) = j
 if (k > 0) goto 130
 
 return
-end
+end subroutine qsortdp
 
 subroutine qsortmpm (n, a, ip)
 
@@ -2224,9 +2268,12 @@ subroutine qsortmpm (n, a, ip)
 
 use mpmodule
 implicit none
-integer i, iq, it, j, jq, jz, k, l, n
-type (mp_realm) a(n), s0
-integer ip(n), ik(50), jk(50)
+integer, intent(in):: n
+type (mp_realm), intent(in):: a(n)
+integer, intent(out):: ip(n)
+integer i, iq, it, j, jq, jz, k, l
+type (mp_realm) s0
+integer ik(100), jk(100)
 
 do i = 1, n
   ip(i) = i
@@ -2315,4 +2362,4 @@ jk(k) = j
 if (k > 0) goto 130
 
 return
-end
+end subroutine qsortmpm

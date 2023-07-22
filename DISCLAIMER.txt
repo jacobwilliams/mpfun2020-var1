@@ -6,7 +6,7 @@ AUTHOR:
    Email: dhbailey@lbl.gov
 
 All software in this package:  
-COPYRIGHT (c) 2020 by David H. Bailey.  All rights reserved.
+COPYRIGHT (c) 2022 by David H. Bailey.  All rights reserved.
 
 By downloading any or all of this software, you agree to the following:
 

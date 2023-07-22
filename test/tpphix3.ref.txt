@@ -5,7 +5,7 @@ theta1 complete: k1 =    87
 theta2 complete: k1 =    87
 theta3 complete: k1 =    43
 theta4 complete: k1 =    43
-Alpha CPU time =        0.89
+Alpha CPU time =        0.86
 Alpha =
 1.300398930304085645545468957890093033046416769256684284023845297491649606167746\
 87077655462894064453135420205485292906824115478752011186040490393378339117891538\
@@ -38,10 +38,10 @@ Alpha =
 00537804555224496368445365927463700477607900680285770365054387214373449610786402\
 43606399060956904489083752783840149265149878126735977789289456592789170875411042\
 16211494813991451327154790162894663790307780919341666466285551497374797547996404\
-47114628156698707720e4                  
+471146281566987077200e4                 
 PSLQM3 integer relation detection: n =   49
 Iteration       0  MP initialization
-Iteration       0  Min/max ratio of y =   3.344436e  -198
+Iteration       0  Min/max ratio of y =   3.344316e  -198
 Iteration       0  Start MPM iter: precision =  14 words,  235 digits
 Iteration       1
 Iteration       2
@@ -53,10 +53,10 @@ Iteration       7
 Iteration       8
 Iteration       9
 Iteration      10
-Iteration      10  Min/max ratio of wy =   3.556414e  -161
+Iteration      10  Min/max ratio of wy =   3.556397e  -161
 Iteration      10  MP update
 Iteration      10  updtmp: Min, max of y =   3.344436e  -198   9.403955e   -38
-Iteration      10  Min/max ratio of y =   3.556414e  -161
+Iteration      10  Min/max ratio of y =   3.556397e  -161
 Iteration      10  Start MPM iter: precision =  12 words,  199 digits
 Iteration      11
 Iteration      12
@@ -68,10 +68,10 @@ Iteration      17
 Iteration      18
 Iteration      19
 Iteration      20
-Iteration      20  Min/max ratio of wy =   4.917886e  -120
+Iteration      20  Min/max ratio of wy =   4.917853e  -120
 Iteration      20  MP update
 Iteration      20  updtmp: Min, max of y =   3.344436e  -198   6.800557e   -79
-Iteration      20  Min/max ratio of y =   4.917886e  -120
+Iteration      20  Min/max ratio of y =   4.917853e  -120
 Iteration      20  Start MPM iter: precision =  10 words,  163 digits
 Iteration      21
 Iteration      22
@@ -83,10 +83,10 @@ Iteration      27
 Iteration      28
 Iteration      29
 Iteration      30
-Iteration      30  Min/max ratio of wy =   5.359506e   -79
+Iteration      30  Min/max ratio of wy =   5.359463e   -79
 Iteration      30  MP update
 Iteration      30  updtmp: Min, max of y =   3.344436e  -198   6.240194e  -120
-Iteration      30  Min/max ratio of y =   5.359506e   -79
+Iteration      30  Min/max ratio of y =   5.359463e   -79
 Iteration      30  Start MPM iter: precision =   7 words,  108 digits
 Iteration      31
 Iteration      32
@@ -98,10 +98,10 @@ Iteration      37
 Iteration      38
 Iteration      39
 Iteration      40
-Iteration      40  Min/max ratio of wy =   1.981023e   -38
+Iteration      40  Min/max ratio of wy =   1.981008e   -38
 Iteration      40  MP update
 Iteration      40  updtmp: Min, max of y =   3.344436e  -198   1.688237e  -160
-Iteration      40  Min/max ratio of y =   1.981023e   -38
+Iteration      40  Min/max ratio of y =   1.981008e   -38
 Iteration      40  Start MPM iter: precision =   5 words,   72 digits
 Iteration      41
 Iteration      42
@@ -113,10 +113,10 @@ Iteration      47
 Iteration      48
 Iteration      49
 Iteration      50
-Iteration      50  Min/max ratio of wy =   2.038873e   -30
+Iteration      50  Min/max ratio of wy =   2.038864e   -30
 Iteration      50  MP update
 Iteration      50  updtmp: Min, max of y =   3.344436e  -198   1.640336e  -168
-Iteration      50  Min/max ratio of y =   2.038873e   -30
+Iteration      50  Min/max ratio of y =   2.038864e   -30
 Iteration      50  Start MPM iter: precision =   5 words,   72 digits
 Iteration      51
 Iteration      52
@@ -128,10 +128,10 @@ Iteration      57
 Iteration      58
 Iteration      59
 Iteration      60
-Iteration      60  Min/max ratio of wy =   8.113354e   -28
+Iteration      60  Min/max ratio of wy =   8.113329e   -28
 Iteration      60  MP update
 Iteration      60  updtmp: Min, max of y =   3.344436e  -198   4.122137e  -171
-Iteration      60  Min/max ratio of y =   8.113354e   -28
+Iteration      60  Min/max ratio of y =   8.113329e   -28
 Iteration      60  Start MPM iter: precision =   4 words,   54 digits
 Iteration      61
 Iteration      62
@@ -143,10 +143,10 @@ Iteration      67
 Iteration      68
 Iteration      69
 Iteration      70
-Iteration      70  Min/max ratio of wy =   5.838974e   -24
+Iteration      70  Min/max ratio of wy =   5.838956e   -24
 Iteration      70  MP update
 Iteration      70  updtmp: Min, max of y =   3.344436e  -198   5.727781e  -175
-Iteration      70  Min/max ratio of y =   5.838974e   -24
+Iteration      70  Min/max ratio of y =   5.838956e   -24
 Iteration      70  Start MPM iter: precision =   4 words,   54 digits
 Iteration      71
 Iteration      72
@@ -158,10 +158,10 @@ Iteration      77
 Iteration      78
 Iteration      79
 Iteration      80
-Iteration      80  Min/max ratio of wy =   1.600625e   -20
+Iteration      80  Min/max ratio of wy =   1.600621e   -20
 Iteration      80  MP update
 Iteration      80  updtmp: Min, max of y =   3.344436e  -198   2.089456e  -178
-Iteration      80  Min/max ratio of y =   1.600625e   -20
+Iteration      80  Min/max ratio of y =   1.600621e   -20
 Iteration      80  Start MPM iter: precision =   4 words,   54 digits
 Iteration      81
 Iteration      82
@@ -173,86 +173,87 @@ Iteration      87
 Iteration      88
 Iteration      89
 Iteration      90
-Iteration      90  Min/max ratio of wy =   5.339342e    -3
+Iteration      90  Min/max ratio of wy =   5.339340e    -3
 Iteration      90  Return to DP iterations
 Iteration      90  MP update
 Iteration      90  updtmp: Min, max of y =   3.551811e  -200   6.652152e  -198
-Iteration      90  Min/max ratio of y =   5.339342e    -3
+Iteration      90  Min/max ratio of y =   5.339340e    -3
 Iteration     500
 Iteration    1000
-Iteration    1291  updtmpm: Small value in wy =   3.267281e  -233
-Iteration    1291  MP update
-Iteration    1291  updtmp: Min, max of y =   2.173445e  -430   1.196846e  -425
-Iteration    1291  Norm bound =   5.757325e    7   Max. bound =   5.757325e    7
-Iteration    1291  Min/max ratio of y =   1.815977e    -5
+Iteration    1332  updtmpm: Small value in wy =   2.140444e  -237
+Iteration    1332  updtmpm: Large value in wa or wb =   9.315891e   234
+Iteration    1332  MP update
+Iteration    1332  updtmp: Min, max of y =   1.423880e  -434   3.512743e  -432
+Iteration    1332  Norm bound =   8.091375e    7   Max. bound =   8.091375e    7
+Iteration    1332  Min/max ratio of y =   4.053470e    -3
 Iteration    1500
 Iteration    2000
 Iteration    2500
-Iteration    2591  updtmpm: Small value in wy =   2.973260e  -239
-Iteration    2591  updtmpm: Large value in wa or wb =   6.376056e   235
-Iteration    2591  MP update
-Iteration    2591  updtmp: Min, max of y =   3.558535e  -664   1.867545e  -661
-Iteration    2591  Norm bound =   5.612888e   12   Max. bound =   5.612888e   12
-Iteration    2591  Min/max ratio of y =   1.905461e    -3
+Iteration    2649  updtmpm: Small value in wy =   6.318366e  -240
+Iteration    2649  updtmpm: Large value in wa or wb =   4.265422e   237
+Iteration    2649  MP update
+Iteration    2649  updtmp: Min, max of y =   2.219553e  -671   2.041603e  -669
+Iteration    2649  Norm bound =   7.600586e   12   Max. bound =   7.600586e   12
+Iteration    2649  Min/max ratio of y =   1.087161e    -2
 Iteration    3000
 Iteration    3500
-Iteration    3884  updtmpm: Small value in wy =   3.619902e  -236
-Iteration    3884  updtmpm: Large value in wa or wb =   3.694969e   233
-Iteration    3884  MP update
-Iteration    3884  updtmp: Min, max of y =   6.760330e  -897   1.021252e  -894
-Iteration    3884  Norm bound =   3.622251e   17   Max. bound =   3.622251e   17
-Iteration    3884  Min/max ratio of y =   6.619648e    -3
+Iteration    3925  updtmpm: Small value in wy =   3.497098e  -234
+Iteration    3925  updtmpm: Large value in wa or wb =   3.640666e   230
+Iteration    3925  MP update
+Iteration    3925  updtmp: Min, max of y =   7.139888e  -903   1.669806e  -899
+Iteration    3925  Norm bound =   3.764095e   17   Max. bound =   3.764095e   17
+Iteration    3925  Min/max ratio of y =   4.275878e    -4
 Iteration    4000
 Iteration    4500
 Iteration    5000
-Iteration    5170  updtmpm: Small value in wy =   6.284120e  -236
-Iteration    5170  updtmpm: Large value in wa or wb =   1.248907e   232
-Iteration    5170  MP update
-Iteration    5170  updtmp: Min, max of y =   6.417671e -1130   3.622359e -1126
-Iteration    5170  Norm bound =   2.306219e   22   Max. bound =   2.306219e   22
-Iteration    5170  Min/max ratio of y =   1.771683e    -4
+Iteration    5209  updtmpm: Small value in wy =   1.849257e  -236
+Iteration    5209  updtmpm: Large value in wa or wb =   1.058119e   237
+Iteration    5209  MP update
+Iteration    5209  updtmp: Min, max of y =   3.087943e -1135   1.875461e -1132
+Iteration    5209  Norm bound =   3.738552e   22   Max. bound =   3.738552e   22
+Iteration    5209  Min/max ratio of y =   1.646497e    -3
 Iteration    5500
 Iteration    6000
-Iteration    6473  updtmpm: Small value in wy =   8.515506e  -239
-Iteration    6473  updtmpm: Large value in wa or wb =   9.168990e   233
-Iteration    6473  MP update
-Iteration    6473  updtmp: Min, max of y =   3.084622e -1364   1.516652e -1359
-Iteration    6473  Norm bound =   1.761905e   27   Max. bound =   1.761905e   27
-Iteration    6473  Min/max ratio of y =   2.033837e    -5
+Iteration    6492  updtmpm: Small value in wy =   6.199878e  -236
+Iteration    6492  updtmpm: Large value in wa or wb =   3.035134e   232
+Iteration    6492  MP update
+Iteration    6492  updtmp: Min, max of y =   1.162804e -1367   1.570074e -1364
+Iteration    6492  Norm bound =   2.533183e   27   Max. bound =   2.533183e   27
+Iteration    6492  Min/max ratio of y =   7.406044e    -4
 Iteration    6500
 Iteration    7000
 Iteration    7500
-Iteration    7743  updtmpm: Small value in wy =   4.685819e  -240
-Iteration    7743  updtmpm: Large value in wa or wb =   1.325088e   236
-Iteration    7743  MP update
-Iteration    7743  updtmp: Min, max of y =   7.106782e -1599   1.819848e -1595
-Iteration    7743  Norm bound =   1.370938e   32   Max. bound =   1.370938e   32
-Iteration    7743  Min/max ratio of y =   3.905151e    -4
+Iteration    7812  updtmpm: Small value in wy =   5.189414e  -241
+Iteration    7812  updtmpm: Large value in wa or wb =   4.166122e   238
+Iteration    7812  MP update
+Iteration    7812  updtmp: Min, max of y =   8.147359e -1605   5.817028e -1603
+Iteration    7812  Norm bound =   2.307781e   32   Max. bound =   2.307781e   32
+Iteration    7812  Min/max ratio of y =   1.400604e    -2
 Iteration    8000
 Iteration    8500
 Iteration    9000
-Iteration    9049  updtmpm: Small value in wy =   5.903898e  -236
-Iteration    9049  updtmpm: Large value in wa or wb =   3.731869e   233
-Iteration    9049  MP update
-Iteration    9049  updtmp: Min, max of y =   1.074420e -1830   6.063824e -1828
-Iteration    9049  Norm bound =   9.193153e   36   Max. bound =   9.193153e   36
-Iteration    9049  Min/max ratio of y =   1.771852e    -3
+Iteration    9131  updtmpm: Small value in wy =   5.711266e  -240
+Iteration    9131  updtmpm: Large value in wa or wb =   1.738575e   237
+Iteration    9131  MP update
+Iteration    9131  updtmp: Min, max of y =   3.322386e -1842   1.441329e -1839
+Iteration    9131  Norm bound =   1.960474e   37   Max. bound =   1.960474e   37
+Iteration    9131  Min/max ratio of y =   2.305085e    -3
 Iteration    9500
 Iteration   10000
-Iteration   10090  updtmpm: Small value in wy =   8.102646e  -250
-Iteration   10090  updtmpm: Small min/max ratio of wy =   1.020104e   -62
-Iteration   10090  MP update
-Iteration   10090  updtmp: Min, max of y =   1.214420e -2510   4.816472e -2015
-Iteration   10090  updtmp: Small value in y =   1.214420e -2510
-Iteration   10090  Norm bound =   8.726938e   40   Max. bound =   8.726938e   40
-Iteration   10090  Relation detected
-Min, max of y =   1.214420e -2510   4.816472e -2015
-Max. bound =   8.726938e    40
-Index of relation =   1   Norm =    2.39891e   41   Residual =   1.214420e -2510
+Iteration   10111  updtmpm: Small value in wy =   2.955247e  -249
+Iteration   10111  updtmpm: Small min/max ratio of wy =   6.388828e   -73
+Iteration   10111  MP update
+Iteration   10111  updtmp: Min, max of y =   1.214420e -2510   6.667233e -2016
+Iteration   10111  updtmp: Small value in y =   1.214420e -2510
+Iteration   10111  Norm bound =   6.657711e   40   Max. bound =   6.657711e   40
+Iteration   10111  Relation detected
+Min, max, ratio of y =   1.214420e -2510   6.667233e -2016   1.821475e  -495
+Max. bound =   6.657711e   40
+Index of relation =   1   Norm =   2.398925e   41   Residual =   1.214420e -2510
 CPU run times:
-        0.04        0.08        0.64        4.89        3.45        1.02       10.12
-PSLQM3 CPU time =       10.51
-Total CPU time =       11.41
+        0.03        0.08        0.60        4.15        3.37        0.99        9.23
+PSLQM3 CPU time =        9.64
+Total CPU time =       10.50
 
 Recovered half relation: 0 =
                       -7093753211994498369512281621136886726656. * 1

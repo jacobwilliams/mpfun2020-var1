@@ -2,14 +2,14 @@
 
 !  MPFUN20: A thread-safe Fortran arbitrary precision computation package
 
-!  Revision date:  31 May 2021
+!  Revision date:  9 Jan 2022
 
 !  AUTHOR:
 !     David H. Bailey
 !     Lawrence Berkeley National Lab (retired) and University of California, Davis
 !     Email: dhbailey@lbl.gov
 
-!  All software in this package (c) 2021 David H. Bailey
+!  All software in this package (c) 2022 David H. Bailey
 
 !  PURPOSE OF THESE ROUTINES:
 !    These routines define timing functions for use in the MPFUN20 package.
@@ -47,7 +47,7 @@ function secondwc ()
 !     runtime = secondwe (tm1 - tm0)
 
 real (kind (0.d0)) secondwc
-integer itm1, itm2, itm3
+integer (selected_int_kind (18)) itm1, itm2, itm3
 
 call system_clock (itm1, itm2, itm3)
 secondwc = itm1 / dble (itm2)
