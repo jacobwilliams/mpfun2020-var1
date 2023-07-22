@@ -45,10 +45,10 @@
 !    This module contains all high-level Fortran-90 language interfaces for
 !    operations using the standard high-precision datatype.
 !    There are two variants of this module:
-!      mpfung1.f90	Mixed-mode operations ARE allowed; precision level
+!      mpfung1.f90  Mixed-mode operations ARE allowed; precision level
 !                     arguments are NOT required in certain functions;
 !                     quad precision (128-bit) is NOT supported.
-!      mpfung2.f90	Mixed-mode operations are NOT allowed; precision level
+!      mpfung2.f90  Mixed-mode operations are NOT allowed; precision level
 !                     arguments ARE required in certain functions.
 !                     quad precision (128-bit) is NOT supported.
 !    Compile and link whichever one of these is most appropriate for the

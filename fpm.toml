@@ -5,9 +5,6 @@ description = "FPM Package for MPFUN2020 (var1)"
 homepage = "https://github.com/jacobwilliams/mpfun2020-var1"
 keywords = ["arbitrary precision"]
 
-[fortran]
-implicit-external = true
-
 [build]
 auto-executables = false
 auto-examples = false

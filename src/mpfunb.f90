@@ -48,6 +48,7 @@
 
 module mpfunb
 use mpfuna
+use mpmask
 implicit none
 
 contains
@@ -72,7 +73,7 @@ subroutine mpabs (ra, rb, mpnw)
 !   This routine sets rb = absolute value of ra.
 
 implicit none
-integer (mpiknd), intent(in):: ra(0:) 
+integer (mpiknd), intent(in):: ra(0:)
 integer (mpiknd), intent(out):: rb(0:)
 integer mpnw
 
@@ -502,7 +503,7 @@ endif
 na = min (max (int (abs (a(2))), int (abs (a(la+2)))), mpnw)
 if (na == 0) then
   if (n >= 0) then
-  	b(1) = mpnw
+    b(1) = mpnw
     b(2) = 0
     b(3) = 0
     b(4) = 0
@@ -1070,7 +1071,6 @@ integer, intent(in):: mpnw
 real (mprknd), intent(in):: b
 integer (mpiknd), intent(in):: a(0:)
 integer (mpiknd), intent(out):: c(0:)
-real (mprknd), external:: mpmask13
 real (mprknd) t2
 
 ! End of declaration
@@ -1203,7 +1203,6 @@ implicit none
 integer, intent(in):: mpnw, n
 real (mprknd), intent(in):: a
 integer (mpiknd), intent(out):: b(0:)
-real (mprknd), external:: mpmask13
 real (mprknd) t2
 
 ! End of declaration
@@ -1759,7 +1758,6 @@ integer, intent(in):: mpnw
 integer (mpiknd), intent(in):: a(0:)
 real (mprknd), intent(in):: b
 integer (mpiknd), intent(out):: c(0:)
-real (mprknd), external:: mpmask13
 real (mprknd) t2
 
 ! End of declaration
@@ -1793,7 +1791,7 @@ subroutine mpneg (ra, rb, mpnw)
 !   This routine sets RB = negation of RA.
 
 implicit none
-integer (mpiknd), intent(in):: ra(0:) 
+integer (mpiknd), intent(in):: ra(0:)
 integer (mpiknd), intent(out):: rb(0:)
 integer mpnw, na
 
@@ -1988,7 +1986,7 @@ na = min (int (abs (a(2))), mpnw)
 
 if (na == 0) then
   if (n >= 0) then
-  	b(1) = mpnw
+    b(1) = mpnw
     b(2) = 0
     b(3) = 0
     b(4) = 0
@@ -2180,7 +2178,7 @@ if (n1 <= -30) then
 
 100 continue
 
-	k = k + 1
+  k = k + 1
     t1 = 1 - k * n
     t2 = (k + 1) * n
     call mpmuld (s1, t1, s3, mpnw1)
@@ -2190,7 +2188,7 @@ if (n1 <= -30) then
     call mpadd (s1, s2, s3, mpnw1)
     call mpeq (s3, s2, mpnw1)
     if (s1(2) /= 0 .and. s1(3) >= - mpnw1) then
-    	  goto 100
+      goto 100
     else
       call mpeq (s2, s1, mpnw1)
       goto 130
@@ -2822,8 +2820,6 @@ integer, parameter:: knd = max (mprknd2, kind (1.0))
 real (knd), intent(in):: a
 integer (mpiknd), intent(out):: b(0:)
 real (knd) t2
-real (knd) mpmask23
-external mpmask23
 
 ! End of declaration
 

@@ -49,10 +49,10 @@
 !    from two high-precision datatypes (e.g., tpslqm3.f90 and tpphix3.f90).
 
 !    There are two variants of this module:
-!      mpfunh1.f90	Mixed-mode operations ARE allowed; precision level
+!      mpfunh1.f90  Mixed-mode operations ARE allowed; precision level
 !                     arguments are NOT required in certain functions;
 !                     quad precision (128-bit) is NOT supported.
-!      mpfunh2.f90	Mixed-mode operations are NOT allowed; precision level
+!      mpfunh2.f90  Mixed-mode operations are NOT allowed; precision level
 !                     arguments ARE required in certain functions.
 !                     quad precision (128-bit) is NOT supported.
 !    Compile and link whichever one of these is most appropriate for the

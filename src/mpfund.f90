@@ -46,6 +46,8 @@ use mpfuna
 use mpfunb
 use mpfunc
 
+implicit none
+
 contains
 
 subroutine mpagmr (a, b, c, mpnw)
